@@ -16,21 +16,8 @@ const sharp = require('sharp');
     const size = Math.max(metadata.width || 0, metadata.height || 0);
     if (!size) throw new Error('Invalid image size from source PNG');
 
-    const padded = image.extend({
-      top: Math.floor((size - (metadata.height || 0)) / 2),
-      bottom: Math.floor((size - (metadata.height || 0)) / 2),
-      left: Math.floor((size - (metadata.width || 0)) / 2),
-      right: Math.floor((size - (metadata.width || 0)) / 2),
-      background: { r: 0, g: 0, b: 0, alpha: 0 }
-    });
-
-    const squareBuffer = await padded
-      .resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-      .png()
-      .toBuffer();
-
-    const pngBuffer = await sharp(squareBuffer)
-      .resize(256, 256, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    const pngBuffer = await image
+      .resize(256, 256, { fit: 'cover', position: 'centre' })
       .png()
       .toBuffer();
 
