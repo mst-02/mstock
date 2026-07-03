@@ -1,9 +1,36 @@
 const fs = require('fs');
 const path = require('path');
-let pngToIco = require('png-to-ico');
-if (typeof pngToIco !== 'function' && pngToIco && typeof pngToIco.default === 'function') pngToIco = pngToIco.default;
-let Jimp = require('jimp');
-if (Jimp && !Jimp.read && Jimp.default && typeof Jimp.default.read === 'function') Jimp = Jimp.default;
+
+// Use dynamic imports because `png-to-ico` is an ES module and can't be required in CommonJS.
+(async function run() {
+  try {
+    const JimpModule = await import('jimp');
+    const Jimp = JimpModule.default || JimpModule;
+
+    const pngToIcoModule = await import('png-to-ico');
+    const pngToIco = pngToIcoModule.default || pngToIcoModule;
+
+    const src = path.join(__dirname, '..', 'Screenshot 2026-07-02 042824.png');
+    const outDir = path.join(__dirname, '..', 'build');
+    if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+
+    const image = await Jimp.read(src);
+    const size = Math.max(image.bitmap.width, image.bitmap.height);
+
+    const square = new Jimp(size, size, 0xffffffff);
+    square.composite(image, Math.floor((size - image.bitmap.width) / 2), Math.floor((size - image.bitmap.height) / 2));
+
+    const buf = await square.getBufferAsync(Jimp.MIME_PNG);
+
+    const icoBuf = await pngToIco(buf);
+    fs.writeFileSync(path.join(outDir, 'icon.ico'), icoBuf);
+    console.log('Conversion finished: build/icon.ico');
+    process.exit(0);
+  } catch (err) {
+    console.error('Conversion failed', err);
+    process.exit(1);
+  }
+})();
 
 async function run() {
   const src = path.join(__dirname, '..', 'Screenshot 2026-07-02 042824.png');
