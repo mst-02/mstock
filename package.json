@@ -20,8 +20,9 @@
   "devDependencies": {
     "electron": "^31.0.0",
     "electron-builder": "^26.15.3",
+    "jimp": "^1.4.1",
     "png-to-ico": "*",
-    "jimp": "^1.4.1"
+    "sharp": "^0.35.3"
   },
   "build": {
     "appId": "com.mstock.app",
@@ -29,7 +30,9 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "artifactName": "Mstock-${version}-${arch}.${ext}",

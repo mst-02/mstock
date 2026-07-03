@@ -1,12 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+const sharp = require('sharp');
 
-// Use dynamic imports because `png-to-ico` is an ES module and can't be required in CommonJS.
 (async function run() {
   try {
-    const JimpModule = await import('jimp');
-    const Jimp = JimpModule.default || JimpModule;
-
     const pngToIcoModule = await import('png-to-ico');
     const pngToIco = pngToIcoModule.default || pngToIcoModule;
 
@@ -14,15 +11,30 @@ const path = require('path');
     const outDir = path.join(__dirname, '..', 'build');
     if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-    const image = await Jimp.read(src);
-    const size = Math.max(image.bitmap.width, image.bitmap.height);
+    const image = sharp(src);
+    const metadata = await image.metadata();
+    const size = Math.max(metadata.width || 0, metadata.height || 0);
+    if (!size) throw new Error('Invalid image size from source PNG');
 
-    const square = new Jimp(size, size, 0xffffffff);
-    square.composite(image, Math.floor((size - image.bitmap.width) / 2), Math.floor((size - image.bitmap.height) / 2));
+    const padded = image.extend({
+      top: Math.floor((size - (metadata.height || 0)) / 2),
+      bottom: Math.floor((size - (metadata.height || 0)) / 2),
+      left: Math.floor((size - (metadata.width || 0)) / 2),
+      right: Math.floor((size - (metadata.width || 0)) / 2),
+      background: { r: 0, g: 0, b: 0, alpha: 0 }
+    });
 
-    const buf = await square.getBufferAsync(Jimp.MIME_PNG);
+    const squareBuffer = await padded
+      .resize(size, size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toBuffer();
 
-    const icoBuf = await pngToIco(buf);
+    const pngBuffer = await sharp(squareBuffer)
+      .resize(256, 256, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .png()
+      .toBuffer();
+
+    const icoBuf = await pngToIco(pngBuffer);
     fs.writeFileSync(path.join(outDir, 'icon.ico'), icoBuf);
     console.log('Conversion finished: build/icon.ico');
     process.exit(0);
@@ -32,31 +44,3 @@ const path = require('path');
   }
 })();
 
-async function run() {
-  const src = path.join(__dirname, '..', 'Screenshot 2026-07-02 042824.png');
-  const tmp = path.join(__dirname, '..', 'build', 'tmp_icon_256.png');
-  const out = path.join(__dirname, '..', 'build', 'icon.ico');
-  if (!fs.existsSync(src)) {
-    console.error('Source PNG not found:', src);
-    process.exit(1);
-  }
-  try {
-    const img = await Jimp.read(src);
-    // make square by taking max dimension and filling with transparent background
-    const size = Math.max(img.bitmap.width, img.bitmap.height);
-    const square = new Jimp(size, size, 0x00000000);
-    const x = Math.floor((size - img.bitmap.width) / 2);
-    const y = Math.floor((size - img.bitmap.height) / 2);
-    square.composite(img, x, y);
-    square.resize(256, 256);
-    await square.writeAsync(tmp);
-    const buf = await pngToIco(tmp);
-    fs.writeFileSync(out, buf);
-    console.log('Wrote', out);
-  } catch (err) {
-    console.error('Conversion failed', err);
-    process.exit(2);
-  }
-}
-
-run();
