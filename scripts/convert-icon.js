@@ -7,17 +7,16 @@ const sharp = require('sharp');
     const pngToIcoModule = await import('png-to-ico');
     const pngToIco = pngToIcoModule.default || pngToIcoModule;
 
-    const src = path.join(__dirname, '..', 'Screenshot 2026-07-02 042824.png');
     const outDir = path.join(__dirname, '..', 'build');
     if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
-    const image = sharp(src);
-    const metadata = await image.metadata();
-    const size = Math.max(metadata.width || 0, metadata.height || 0);
-    if (!size) throw new Error('Invalid image size from source PNG');
+    const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" rx="48" ry="48" fill="#1E90FF" />
+  <text x="50%" y="52%" font-family="Arial, Helvetica, sans-serif" font-size="140" fill="#FFFFFF" font-weight="700" text-anchor="middle" dominant-baseline="middle">MS</text>
+</svg>`;
 
-    const pngBuffer = await image
-      .resize(256, 256, { fit: 'cover', position: 'centre' })
+    const pngBuffer = await sharp(Buffer.from(svg))
       .png()
       .toBuffer();
 
