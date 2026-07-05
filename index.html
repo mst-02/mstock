@@ -2,8 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Mstock POS - النظام الحديدي المتكامل</title>
+    <title>Mstock POS</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
         :root {
             --primary-color: #1e3a8a;
             --accent-color: #10b981;
@@ -24,7 +25,7 @@
         }
 
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: var(--bg-color); 
             margin: 0; padding: 0; display: flex; height: 100vh; overflow: hidden; 
         }
@@ -109,6 +110,9 @@
         .form-control { display: flex; flex-direction: column; margin-bottom: 12px; position: relative; }
         .form-control label { font-weight: 600; margin-bottom: 5px; color: var(--text-main); }
         .form-control input, .form-control select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; background: var(--card-bg); color: var(--text-main); }
+        body.dark-mode .form-control input, body.dark-mode .form-control select, body.dark-mode .search-bar { border-color: #475569; background: #0f172a; color: #f8fafc; }
+        body.dark-mode input:disabled, body.dark-mode input[readonly], body.dark-mode select:disabled { background-color: #1e293b; border-color: #334155; color: #94a3b8; }
+        body.dark-mode input::placeholder { color: #94a3b8; }
         .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
 
         .tabs-header { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
@@ -128,6 +132,7 @@
         .live-search-item:hover { background-color: #3b82f6; color: white; }
 
         .faded-row { opacity: 0.4; background-color: #f1f5f9 !important; }
+        body.dark-mode .faded-row { background-color: #334155 !important; }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -151,15 +156,19 @@
 
     <div id="global-toast" class="toast-container"></div>
 
-    <div id="activation-screen" class="security-overlay" style="display:none;">
-        <div class="security-box" id="act-box">
-            <h2>رخصة تفعيل Mstock POS</h2>
-            <div style="font-size: 16px; color: #94a3b8; margin-bottom: 20px;">
-                <span>كود جهازك هو: </span>
-                <span style="color: var(--warning-color); font-family: monospace; font-size: 18px; font-weight: bold;" id="hw-id-display">Faraj_Dev_2026</span>
+    <div id="activation-screen" class="security-overlay" style="display:none; z-index: 9999;">
+        <div class="security-box" id="act-box" style="width: 450px; background: #0f172a; color: #f8fafc; border: 1px solid #334155; border-radius: 12px; padding: 30px;">
+            <h2 style="margin-bottom: 25px;">تفعيل رخصة Mstock POS</h2>
+            <div class="form-control" style="text-align: right;">
+                <label style="color: #cbd5e1; font-weight: bold; display: block; margin-bottom: 5px;">اسم المستخدم أو المتجر</label>
+                <input type="text" id="license-client-name" placeholder="أدخل اسمك أو اسم المتجر..." style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #475569; color: #f8fafc; border-radius: 6px;">
             </div>
-            <input type="text" id="license-input" placeholder="أدخل مفتاح التفعيل هنا...">
-            <button class="btn btn-success" style="width: 100%; padding: 12px;" onclick="validateLicense()">تفعيل المنظومة</button>
+            <div class="form-control" style="text-align: right; margin-bottom: 25px;">
+                <label style="color: #cbd5e1; font-weight: bold; display: block; margin-bottom: 5px;">كود التفعيل (تواصل مع الدعم)</label>
+                <input type="password" id="license-input" placeholder="أدخل كود التفعيل المستلم..." style="width: 100%; padding: 12px; background: #1e293b; border: 1px solid #475569; color: #f8fafc; border-radius: 6px;" onkeydown="if(event.key === 'Enter') validateSupabaseLicense()">
+            </div>
+            <button class="btn btn-success" style="width: 100%; padding: 14px; font-size: 18px;" onclick="validateSupabaseLicense()">تفعيل المنظومة عبر الإنترنت</button>
+            <div id="activation-status" style="margin-top: 15px; font-weight: bold; font-size: 14px; text-align: center;"></div>
         </div>
     </div>
 
@@ -168,14 +177,6 @@
             <h2>أدخل رمز PIN الحماية</h2>
             <input type="password" id="pin-input" maxlength="4" placeholder="••••" style="font-size: 28px;" onkeydown="if(event.key === 'Enter') validatePIN()">
             <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="validatePIN()">دخول</button>
-        </div>
-    </div>
-
-    <div id="day-start-modal" class="modal-overlay" style="display: flex;">
-        <div class="modal-box" style="text-align: center; padding: 40px 20px;">
-            <h2>Mstock POS - بداية وردية العمل</h2>
-            <p style="color: #64748b; margin-bottom: 25px;">برجاء فتح اليوم لبدء تسجيل الفواتير والعمليات وحساب الأرباح بدقة</p>
-            <button class="btn btn-success" style="padding: 15px 40px; font-size: 18px; width: 100%;" onclick="startCurrentDaySession()">بدء وبداية اليوم الجديد</button>
         </div>
     </div>
 
@@ -259,13 +260,13 @@
                     <div id="pos-payment-cash-block" style="display: none; gap: 10px;">
                         <div class="form-control" style="flex: 1; margin: 0;">
                             <label>المبلغ النقدي</label>
-                            <input type="number" id="pos-cash-amount" placeholder="المبلغ المدفوع...">
+                            <input type="number" id="pos-cash-amount" placeholder="المبلغ المدفوع..." oninput="calculatePosChange()">
                         </div>
                     </div>
                     <div id="pos-payment-vf-block" style="display: none; gap: 10px;">
                         <div class="form-control" style="flex: 1; margin: 0;">
                             <label>المبلغ المحول</label>
-                            <input type="number" id="pos-vf-amount" placeholder="المبلغ المحول...">
+                            <input type="number" id="pos-vf-amount" placeholder="المبلغ المحول..." oninput="calculatePosChange()">
                         </div>
                         <div class="form-control" style="flex: 1; margin: 0;">
                             <label>رقم الكاش</label>
@@ -275,11 +276,11 @@
                     <div id="pos-payment-split-block" style="display: none; gap: 10px;">
                         <div class="form-control" style="flex: 1; margin: 0;">
                             <label>المبلغ النقدي</label>
-                            <input type="number" id="pos-split-cash" placeholder="المبلغ النقدي...">
+                            <input type="number" id="pos-split-cash" placeholder="المبلغ النقدي..." oninput="calculatePosChange()">
                         </div>
                         <div class="form-control" style="flex: 1; margin: 0;">
                             <label>المبلغ المحول</label>
-                            <input type="number" id="pos-split-vf" placeholder="المبلغ المحول...">
+                            <input type="number" id="pos-split-vf" placeholder="المبلغ المحول..." oninput="calculatePosChange()">
                         </div>
                         <div class="form-control" style="flex: 1; margin: 0;">
                             <label>رقم الكاش</label>
@@ -287,6 +288,7 @@
                         </div>
                     </div>
                     <div id="pos-payment-warning" style="display:none; color: var(--danger-color); font-weight:bold;"></div>
+                    <div id="pos-payment-change" style="display:none; color: var(--success); font-weight:bold; font-size:16px;"></div>
                 </div>
             </div>
 
@@ -512,16 +514,25 @@
                             <input type="date" id="report-date-picker" class="search-bar" style="max-width: 180px;" onchange="calculateFinancialReports()">
                         </div>
                     </div>
-                    <div style="display: flex; gap: 20px;">
-                        <div class="order-box" style="flex: 1; text-align: center; background: #eff6ff; border: 1px solid #bfdbfe;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+                        <div class="order-box" style="text-align: center; background: #eff6ff; border: 1px solid #bfdbfe;">
                             <h3 style="margin: 0; color: #1e40af;">إجمالي مبيعات الفترة</h3>
                             <h2 id="report-sales-total" style="font-size: 32px; margin: 10px 0; color: #1d4ed8;">0 ج.م</h2>
                         </div>
-                        <div class="order-box" style="flex: 1; text-align: center; background: #ecfdf5; border: 1px solid #a7f3d0;">
+                        <div class="order-box" style="text-align: center; background: #ecfdf5; border: 1px solid #a7f3d0;">
                             <h3 style="margin: 0; color: #065f46;">صافي الأرباح المحققة</h3>
                             <h2 id="report-profit-total" style="font-size: 32px; margin: 10px 0; color: #047857;">0 ج.م</h2>
                         </div>
+                        <div class="order-box" style="text-align: center; background: #fff7ed; border: 1px solid #fcd34d;">
+                            <h3 style="margin: 0; color: #b45309;">إجمالي النقدي (الدرج)</h3>
+                            <h2 id="report-cash-total" style="font-size: 32px; margin: 10px 0; color: #b45309;">0 ج.م</h2>
+                        </div>
+                        <div class="order-box" style="text-align: center; background: #eef2ff; border: 1px solid #c7d2fe;">
+                            <h3 style="margin: 0; color: #4338ca;">إجمالي فودافون كاش</h3>
+                            <h2 id="report-vf-total" style="font-size: 32px; margin: 10px 0; color: #4338ca;">0 ج.م</h2>
+                        </div>
                     </div>
+                    <div id="report-details-panel" class="order-box" style="margin-top: 20px;"></div>
                 </div>
             </div>
         </div>
@@ -581,7 +592,7 @@
                                     <th>التاجر</th>
                                     <th>نوع العملية</th>
                                     <th>المبلغ الكلي</th>
-                                    <th>التاريخ</th>
+                                    <th>التاريخ والوقت</th>
                                     <th>الإجراءات</th>
                                 </tr>
                             </thead>
@@ -595,7 +606,7 @@
                                     <th>التاجر</th>
                                     <th>نوع العملية</th>
                                     <th>المبلغ الكلي</th>
-                                    <th>التاريخ</th>
+                                    <th>التاريخ والوقت</th>
                                     <th>الإجراءات</th>
                                 </tr>
                             </thead>
@@ -676,7 +687,7 @@
                         <div class="form-control">
                             <label>تعيين رمز PIN الجديد</label>
                             <div style="display: flex; gap: 10px;">
-                                <input type="password" id="set-new-pin" maxlength="4" placeholder="4 أرقام">
+                                <input type="password" id="set-new-pin" maxlength="4" placeholder="4 أرقام" oninput="handleNewPinInput(this)">
                                 <button id="save-pin-btn" class="btn btn-success" onclick="createNewPIN()">حفظ الرمز</button>
                                 <button id="clear-pin-btn" class="btn btn-danger" onclick="clearSavedPIN()">حذف الرمز</button>
                             </div>
@@ -687,9 +698,9 @@
                                 <option value="off">إيقاف التوقيت</option>
                                 <option value="30000">30 ثانية</option>
                                 <option value="60000" selected>1 دقيقة</option>
-                                <option value="300000" selected>5 دقيقة</option>
-                                <option value="1800000" selected>30 دقيقة</option>
-                                <option value="3600000" selected>1 ساعة</option>
+                                <option value="300000">5 دقيقة</option>
+                                <option value="1800000">30 دقيقة</option>
+                                <option value="3600000">1 ساعة</option>
                             </select>
                         </div>
                     </div>
@@ -697,12 +708,30 @@
 
                 <div class="order-box" style="margin-bottom: 30px;">
                     <h3 style="margin-top: 0; color: #3b82f6; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 8px;">النسخ السحابي الأمني</h3>
-                    <div style="display: flex; gap: 12px;">
-                        <button class="btn btn-primary" style="flex: 1;" onclick="showToast('تم الرفع والمزامنة الحية سحابياً!', 'success')">رفع نسخة احتياطية حية</button>
-                        <button class="btn btn-warning" style="flex: 1; color: white;" onclick="showToast('تم استرجاع ومزامنة البيانات بنجاح!', 'success')">استرجاع الداتا من السحابة</button>
+                    <div id="gdrive-auth-box" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                        <div id="gdrive-account-display" style="flex: 1;"><strong>غير متصل بخدمة جوجل درايف</strong></div>
+                        <button id="gdrive-login-btn" class="btn btn-primary btn-sm" onclick="signInGoogleDrive()">تسجيل دخول</button>
+                        <button id="gdrive-logout-btn" class="btn btn-danger btn-sm" onclick="signOutGoogleDrive()" style="display:none;">تسجيل خروج</button>
                     </div>
-                </div>
-            </div>
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button id="gdrive-upload-btn" class="btn btn-primary" style="flex: 1; min-width: 180px;" onclick="uploadAppDataToDrive()">رفع البيانات</button>
+                        <button id="gdrive-restore-btn" class="btn btn-warning" style="flex: 1; min-width: 180px; color: white;" onclick="restoreAppDataFromDrive()">استرجاع البيانات المحفوظة</button>
+                    </div>
+                    <div class="form-control" style="margin-top: 15px;">
+                        <label>مزامنة تلقائية (النسخ السحابي)</label>
+                        <select id="auto-backup-select" onchange="updateAutoBackup()">
+                            <option value="off">بدون</option>
+                            <option value="30">30 دقيقة</option>
+                            <option value="60">1 ساعة</option>
+                            <option value="300">5 ساعة</option>
+                            <option value="720">12 ساعة</option>
+                            <option value="1440">1 يوم</option>
+                            <option value="2880">2 يوم</option>
+                            <option value="7200">5 يوم</option>
+                            <option value="10080">1 أسبوع</option>
+                        </select>
+                    </div>
+                    <div id="gdrive-status" style="margin-top: 15px; font-size: 14px; color: #334155;">لم يتم تسجيل الدخول أو رفع البيانات بعد.</div>
         </div>
 
     </div>
@@ -733,17 +762,61 @@
         let isPinEnabled = true;
         let idleTimer;
         let idleTimeLimit = 60000;
+        let autoBackupInterval = 'off';
+        let autoBackupTimer = null;
         let nextInvoiceId = 1001;
         let activeViewInvoice = null;
         let editingInvoiceId = null;
         let isEditingArchive = false;
-        let isDaySessionOpened = false;
+        let currentPageId = 'cashier-page';
+        let currentMerchantTab = 'sub-tab-supply';
+        let currentMerchantTxTab = 'tx-registry-content';
+
+        const { google } = require('googleapis');
+        const fs = require('fs');
+        const path = require('path');
+        const { createClient } = require('@supabase/supabase-js');
+        const { machineIdSync } = require('node-machine-id');
+        const crypto = require('crypto');
+        
+        const SUPABASE_URL = 'https://jkalectaivvthyxhyvzb.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_Hsu-MCFlu3M6w9qHGRWt2w_gZAgeXI-';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+        const HWID = machineIdSync();
+        const ENCRYPTION_KEY = crypto.scryptSync('Mstock-Super-Secret-Key-2026', 'salt', 32);
+        const LICENSE_PATH = path.join(__dirname, 'license.dat');
+
+        function encrypt(text) {
+            const iv = crypto.randomBytes(16);
+            const cipher = crypto.createCipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
+            let encrypted = cipher.update(text);
+            encrypted = Buffer.concat([encrypted, cipher.final()]);
+            return iv.toString('hex') + ':' + encrypted.toString('hex');
+        }
+
+        function decrypt(text) {
+            try {
+                const textParts = text.split(':');
+                const iv = Buffer.from(textParts.shift(), 'hex');
+                const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+                const decipher = crypto.createDecipheriv('aes-256-cbc', ENCRYPTION_KEY, iv);
+                let decrypted = decipher.update(encryptedText);
+                decrypted = Buffer.concat([decrypted, decipher.final()]);
+                return decrypted.toString();
+            } catch (e) { return null; }
+        }
+        const { ipcRenderer } = require('electron');
+        const OAUTH_CLIENT_PATH = path.join(__dirname, 'client_secret_982440370976-1fvc2c33s2rhntrubi5g8ab0js3a9sqs.apps.googleusercontent.com.json');
+        const DRIVE_FILE_NAME = 'mstock_pos_backup.json';
 
         let selectedMerchantForSupply = null;
         let selectedMerchantForCollection = null;
         let editingMerchantId = null;
         let deletingMerchantId = null;
         let editingTxId = null;
+        let gdriveAccountName = localStorage.getItem('mstock_gdriveAccount') || null;
+        let gdriveBackupFileId = localStorage.getItem('mstock_gdriveFileId') || null;
+        let currentInvoiceTab = 'registry-tab-content';
 
         function showToast(msg, type = 'info') {
             const t = document.getElementById('global-toast');
@@ -752,13 +825,6 @@
             if (type === 'error') t.classList.add('toast-error');
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        function startCurrentDaySession() {
-            isDaySessionOpened = true;
-            document.getElementById('day-start-modal').style.display = 'none';
-            showToast("تم فتح يوم مبيعات جديد بنجاح وتوثيق الوردية حياً!", "success");
-            calculateFinancialReports();
         }
 
         // ريندر المخزن مع الترتيب التسلسلي الثابت التلقائي من الرقم 1 دائماً بعد الحذف
@@ -853,9 +919,11 @@
                 d.onclick = () => {
                     document.getElementById('pos-search-product-input').value = p.name;
                     document.getElementById('pos-search-product-input').dataset.selectedId = p.id;
-                    document.getElementById('pos-item-price').value = p.price;
+                    document.getElementById('pos-item-price').value = '';
+                    document.getElementById('pos-item-price').dataset.wholesalePrice = p.price;
                     document.getElementById('pos-selected-product-info').innerText = `سعر الجملة: ${p.price} ج.م | المتاح: ${p.qty}`;
                     document.getElementById('pos-selected-product-info').style.display = 'block';
+                    document.getElementById('pos-item-price').focus();
                     box.style.display = 'none';
                 };
                 box.appendChild(d);
@@ -928,6 +996,7 @@
             document.getElementById('pos-split-cash').value = '';
             document.getElementById('pos-split-vf').value = '';
             document.getElementById('pos-payment-warning').style.display = 'none';
+            document.getElementById('pos-payment-change').style.display = 'none';
             document.getElementById('pos-payment-fields').style.display = 'none';
             document.getElementById('pos-payment-cash-block').style.display = 'none';
             document.getElementById('pos-payment-vf-block').style.display = 'none';
@@ -998,6 +1067,8 @@
             const qty = parseInt(document.getElementById('pos-item-qty').value);
 
             if(isNaN(price) || isNaN(qty) || qty <= 0 || price <= 0) { showToast("برجاء إدخال السعر والكمية بشكل صحيح!", "error"); return; }
+            const wholesalePrice = parseFloat(document.getElementById('pos-item-price').dataset.wholesalePrice) || 0;
+            if(price < wholesalePrice) { showToast(`لا يمكن البيع بسعر أقل من سعر الجملة (${wholesalePrice} ج.م)!`, "error"); return; }
             if(qty > prod.qty) { showToast(`العجز بالمخزن! المتاح فقط: ${prod.qty}`, "error"); return; }
 
             tempInvoiceItems.push({
@@ -1030,6 +1101,19 @@
             });
             const total = tempInvoiceItems.reduce((sum, item) => sum + item.total, 0);
             document.getElementById('pos-table-total').innerText = `${total} ج.م`;
+            calculatePosChange();
+        }
+
+        function calculatePosChange() {
+            const total = tempInvoiceItems.reduce((sum, item)=> sum + item.total, 0);
+            const paymentAmount = getPosPaymentAmount();
+            const changeDiv = document.getElementById('pos-payment-change');
+            if(paymentAmount > total && total > 0) {
+                changeDiv.innerText = `الباقي للعميل: ${paymentAmount - total} ج.م`;
+                changeDiv.style.display = 'block';
+            } else {
+                changeDiv.style.display = 'none';
+            }
         }
 
         // ميزة حذف صنف مفرد من الفاتورة عبر علامة الـ ×
@@ -1063,14 +1147,30 @@
 
             const now = new Date();
             const dateStr = now.toLocaleDateString('ar-EG') + ' ' + now.toLocaleTimeString('ar-EG');
+            const cashAmt = currentPosPaymentMode === 'split' ? (parseFloat(document.getElementById('pos-split-cash').value) || 0) : (currentPosPaymentMode === 'cash' ? paymentAmount : 0);
+            const vfAmt = currentPosPaymentMode === 'split' ? (parseFloat(document.getElementById('pos-split-vf').value) || 0) : (currentPosPaymentMode === 'vf' ? paymentAmount : 0);
 
             if(editingInvoiceId !== null) {
                 if(isEditingArchive) {
                     let idx = invoiceArchive.findIndex(i=>i.id === editingInvoiceId);
-                    if(idx !== -1) { invoiceArchive[idx].items = [...tempInvoiceItems]; invoiceArchive[idx].total = total; invoiceArchive[idx].paymentMode = currentPosPaymentMode; invoiceArchive[idx].paymentAmount = paymentAmount; }
+                    if(idx !== -1) {
+                        invoiceArchive[idx].items = [...tempInvoiceItems];
+                        invoiceArchive[idx].total = total;
+                        invoiceArchive[idx].paymentMode = currentPosPaymentMode;
+                        invoiceArchive[idx].paymentAmount = paymentAmount;
+                        invoiceArchive[idx].cashAmount = cashAmt;
+                        invoiceArchive[idx].vfAmount = vfAmt;
+                    }
                 } else {
                     let idx = invoiceRegistry.findIndex(i=>i.id === editingInvoiceId);
-                    if(idx !== -1) { invoiceRegistry[idx].items = [...tempInvoiceItems]; invoiceRegistry[idx].total = total; invoiceRegistry[idx].paymentMode = currentPosPaymentMode; invoiceRegistry[idx].paymentAmount = paymentAmount; }
+                    if(idx !== -1) {
+                        invoiceRegistry[idx].items = [...tempInvoiceItems];
+                        invoiceRegistry[idx].total = total;
+                        invoiceRegistry[idx].paymentMode = currentPosPaymentMode;
+                        invoiceRegistry[idx].paymentAmount = paymentAmount;
+                        invoiceRegistry[idx].cashAmount = cashAmt;
+                        invoiceRegistry[idx].vfAmount = vfAmt;
+                    }
                 }
                 showToast("تم تعديل وحفظ الفاتورة بنجاح", "success");
                 saveAppState();
@@ -1079,7 +1179,17 @@
                     const p = stockProducts.find(sp => sp.id === item.productId);
                     if(p) p.qty = Math.max(0, p.qty - item.qty);
                 });
-                invoiceRegistry.push({ id: nextInvoiceId++, dateTime: dateStr, items: [...tempInvoiceItems], total: total, paymentMode: currentPosPaymentMode, paymentAmount: paymentAmount, timestamp: now });
+                invoiceRegistry.push({
+                    id: nextInvoiceId++,
+                    dateTime: dateStr,
+                    items: [...tempInvoiceItems],
+                    total: total,
+                    paymentMode: currentPosPaymentMode,
+                    paymentAmount: paymentAmount,
+                    cashAmount: cashAmt,
+                    vfAmount: vfAmt,
+                    timestamp: now
+                });
                 showToast("تم إضافة منتجات جديد وتثبيت الفاتورة", "success");
                 saveAppState();
             }
@@ -1091,11 +1201,14 @@
         function renderInvoiceTables() {
             const regBody = document.getElementById('invoice-registry-tbody');
             regBody.innerHTML = '';
-            invoiceRegistry.forEach(inv => {
+            invoiceRegistry.slice().sort((a,b) => new Date(b.timestamp || b.dateTime) - new Date(a.timestamp || a.dateTime)).forEach(inv => {
                 const tr = document.createElement('tr');
+                const dt = new Date(inv.timestamp || inv.dateTime);
+                const dStr = isNaN(dt) ? inv.dateTime : dt.toLocaleDateString('ar-EG');
+                const tStr = isNaN(dt) ? '' : dt.toLocaleTimeString('ar-EG');
                 tr.innerHTML = `
                     <td>#${inv.id}</td>
-                    <td>${inv.dateTime}</td>
+                    <td><div style="font-weight:bold;">${dStr}</div><div style="font-size:0.85em; color:#64748b;">${tStr}</div></td>
                     <td>${inv.items.length} أصناف</td>
                     <td><strong>${inv.total} ج.م</strong></td>
                     <td class="no-print">
@@ -1109,11 +1222,14 @@
 
             const arcBody = document.getElementById('invoice-archive-tbody');
             arcBody.innerHTML = '';
-            invoiceArchive.forEach(inv => {
+            invoiceArchive.slice().sort((a,b) => new Date(b.timestamp || b.dateTime) - new Date(a.timestamp || a.dateTime)).forEach(inv => {
                 const tr = document.createElement('tr');
+                const dt = new Date(inv.timestamp || inv.dateTime);
+                const dStr = isNaN(dt) ? inv.dateTime : dt.toLocaleDateString('ar-EG');
+                const tStr = isNaN(dt) ? '' : dt.toLocaleTimeString('ar-EG');
                 tr.innerHTML = `
                     <td>#${inv.id}</td>
-                    <td>${inv.dateTime}</td>
+                    <td><div style="font-weight:bold;">${dStr}</div><div style="font-size:0.85em; color:#64748b;">${tStr}</div></td>
                     <td>${inv.items.length} أصناف</td>
                     <td><strong>${inv.total} ج.م</strong></td>
                     <td class="no-print">
@@ -1139,6 +1255,15 @@
             editingInvoiceId = id; isEditingArchive = fromArchive;
             tempInvoiceItems = [...inv.items];
             renderPosModalTable();
+            selectPosPaymentMode(inv.paymentMode || 'cash');
+            if(inv.paymentMode === 'cash') {
+                document.getElementById('pos-cash-amount').value = inv.cashAmount || inv.paymentAmount || '';
+            } else if(inv.paymentMode === 'vf') {
+                document.getElementById('pos-vf-amount').value = inv.vfAmount || inv.paymentAmount || '';
+            } else if(inv.paymentMode === 'split') {
+                document.getElementById('pos-split-cash').value = inv.cashAmount || '';
+                document.getElementById('pos-split-vf').value = inv.vfAmount || '';
+            }
             document.getElementById('pos-order-modal').style.display = 'flex';
         }
 
@@ -1159,14 +1284,22 @@
             </div>`;
             
             h += `<table style="width:100%; text-align:center; border-collapse:collapse;" border="1">
-                <thead><tr style="background:#e2e8f0;"><th>المنتج</th><th>السعر</th><th>العدد</th><th>الإجمالي</th></tr></thead><tbody>`;
+                <thead><tr><th>المنتج</th><th>السعر</th><th>العدد</th><th>الإجمالي</th></tr></thead><tbody>`;
             inv.items.forEach(i => {
                 h += `<tr><td>${i.name}</td><td>${i.price} ج.م</td><td>${i.qty}</td><td><strong>${i.total} ج.م</strong></td></tr>`;
             });
             h += `</tbody></table><br><div style="text-align:left; font-weight:bold; font-size:16px;">الإجمالي الصافي: ${inv.total} ج.م</div>`;
             if(inv.paymentMode) {
                 const paymentLabel = inv.paymentMode === 'cash' ? 'نقدي' : inv.paymentMode === 'vf' ? 'فودافون كاش' : 'تقسيم';
-                h += `<div style="margin-top:10px; text-align:left;">طريقة الدفع: <strong>${paymentLabel}</strong> | المبلغ المدخل: <strong>${inv.paymentAmount || 0} ج.م</strong></div>`;
+                const paidAmt = parseFloat(inv.paymentAmount) || 0;
+                const totalAmt = parseFloat(inv.total) || 0;
+                const changeAmt = Math.max(0, paidAmt - totalAmt);
+                h += `<div style="margin-top:10px; text-align:left;">طريقة الدفع: <strong>${paymentLabel}</strong> | المبلغ المدخل: <strong>${paidAmt} ج.م</strong>`;
+                if(changeAmt > 0) h += ` | الباقي للعميل: <strong style="color:var(--danger-color);">${changeAmt} ج.م</strong>`;
+                h += `</div>`;
+                if(inv.paymentMode === 'split') {
+                    h += `<div style="margin-top:8px; text-align:left;">نقدي: <strong>${inv.cashAmount || 0} ج.م</strong> | فودافون كاش: <strong>${inv.vfAmount || 0} ج.م</strong></div>`;
+                }
             }
             
             document.getElementById('view-invoice-details-content').innerHTML = h;
@@ -1217,6 +1350,13 @@
                 const costPrice = typeof item.costPrice === 'number' ? item.costPrice : 0;
                 return itemSum + ((item.price - costPrice) * item.qty);
             }, 0), 0);
+            let cashTotal = 0;
+            let vfTotal = 0;
+            filtered.forEach(inv => {
+                const change = Math.max(0, (parseFloat(inv.paymentAmount) || 0) - inv.total);
+                cashTotal += (parseFloat(inv.cashAmount) || 0) - change;
+                vfTotal += parseFloat(inv.vfAmount) || 0;
+            });
             const soldPieces = filtered.reduce((sum, inv) => sum + inv.items.reduce((pieceSum, item) => pieceSum + item.qty, 0), 0);
             const productCounts = {};
             filtered.forEach(inv => inv.items.forEach(item => {
@@ -1226,12 +1366,14 @@
 
             document.getElementById('report-sales-total').innerText = `${salesTotal} ج.م`;
             document.getElementById('report-profit-total').innerText = `${profitTotal} ج.م`;
+            document.getElementById('report-cash-total').innerText = `${cashTotal} ج.م`;
+            document.getElementById('report-vf-total').innerText = `${vfTotal} ج.م`;
             const panel = document.getElementById('report-details-panel');
             panel.innerHTML = `
                 <h3 style="margin-top:0;">تفاصيل الفترة</h3>
                 <div style="display:flex; gap:16px; flex-wrap:wrap;">
-                    <div style="flex:1; min-width:180px; background:white; padding:12px; border-radius:6px;"><strong>عدد القطع المباعة:</strong> ${soldPieces}</div>
-                    <div style="flex:1; min-width:220px; background:white; padding:12px; border-radius:6px;"><strong>أكثر 3 منتجات طلبًا:</strong><br>${topProducts.length ? topProducts.map(([name, qty]) => `• ${name}: ${qty} قطعة`).join('<br>') : 'لا توجد بيانات'}</div>
+                    <div style="flex:1; min-width:180px; background:var(--bg-color); padding:12px; border-radius:6px; border: 1px solid #cbd5e1;"><strong>عدد القطع المباعة:</strong> ${soldPieces}</div>
+                    <div style="flex:1; min-width:220px; background:var(--bg-color); padding:12px; border-radius:6px; border: 1px solid #cbd5e1;"><strong>أكثر 3 منتجات طلبًا:</strong><br>${topProducts.length ? topProducts.map(([name, qty]) => `• ${name}: ${qty} قطعة`).join('<br>') : 'لا توجد بيانات'}</div>
                 </div>`;
         }
 
@@ -1332,7 +1474,7 @@
             document.getElementById('supply-price').value = '';
             document.getElementById('supply-merchant-search').value = '';
             document.getElementById('supply-merchant-search').removeAttribute('data-id');
-            document.getElementById('supply-paid').value = '0';
+            document.getElementById('supply-paid').value = '';
             document.getElementById('supply-debt-total').value = '0';
             document.getElementById('supply-modal').style.display = 'flex';
         }
@@ -1388,10 +1530,18 @@
                 stockProducts.push({ id: Date.now(), name: prodName, qty: qty, price: wholesaleUnitPrice });
             }
 
-            // توثيق السجل
+            // توثيق عملية الإضافة بسعر الفاتورة الكامل
             merchantTransactions.push({
-                id: Date.now(), merchantId: mId, merchantName: m.name, type: "إضافة بضاعة", amount: paid, date: new Date().toLocaleDateString('ar-EG'), archived: false
+                id: Date.now(), merchantId: mId, merchantName: m.name,
+                type: "إضافة بضاعة", amount: price, timestamp: new Date().toISOString(), archived: false
             });
+
+            if(paid > 0) {
+                merchantTransactions.push({
+                    id: Date.now() + 1, merchantId: mId, merchantName: m.name,
+                    type: "تحصيل", amount: paid, timestamp: new Date().toISOString(), archived: false
+                });
+            }
 
             closeSupplyModal(); renderStockTable(); renderMerchantsTable(); renderTxTable();
             showToast("تم حفظ التوريد، وحساب سعر الجملة وضخ السلعة في المخزن بنجاح!", "success");
@@ -1458,7 +1608,7 @@
             m.debt = remainingDebt; // استبدال وتعديل قيمة المديونية بالمديونية المتبقية فوراً
 
             merchantTransactions.push({
-                id: Date.now(), merchantId: mId, merchantName: m.name, type: "تحصيل", amount: collectAmount, date: new Date().toLocaleDateString('ar-EG'), archived: false
+                id: Date.now(), merchantId: mId, merchantName: m.name, type: "تحصيل", amount: collectAmount, timestamp: new Date().toISOString(), archived: false
             });
 
             closeCollectionModal(); renderMerchantsTable(); renderTxTable();
@@ -1471,11 +1621,14 @@
 
             merchantTransactions.slice().sort((a,b) => b.id - a.id).forEach(tx => {
                 const tr = document.createElement('tr');
+                const dt = new Date(tx.timestamp || tx.date);
+                const dStr = isNaN(dt) ? tx.date : dt.toLocaleDateString('ar-EG');
+                const tStr = isNaN(dt) ? '' : dt.toLocaleTimeString('ar-EG');
                 tr.innerHTML = `
                     <td><strong>${tx.merchantName}</strong></td>
                     <td><span class="btn btn-sm" style="background:#f1f5f9; color:#1e293b; pointer-events:none;">${tx.type}</span></td>
-                    <td><strong style="color:var(--accent-color);">${tx.amount} ج.م</strong></td>
-                    <td>${tx.date}</td>
+                    <td><strong style="color:${tx.type === 'إضافة بضاعة' ? 'var(--danger-color)' : 'var(--accent-color)'};">${tx.amount} ج.م</strong></td>
+                    <td><div style="font-weight:bold;">${dStr}</div><div style="font-size:0.85em; color:#64748b;">${tStr}</div></td>
                     <td class="no-print">
                         ${!tx.archived ? `<button class="btn btn-warning btn-sm" style="color:white;" onclick="archiveTxDirectly(${tx.id})">أرشفة</button>` : ''}
                         <button class="btn btn-success btn-sm" onclick="openViewTransactionModal(${tx.id})">عرض</button>
@@ -1493,12 +1646,15 @@
         function openViewTransactionModal(id) {
             const tx = merchantTransactions.find(i=>i.id === id); if(!tx) return;
             document.getElementById('view-transaction-title').innerText = `تفاصيل الحركة #${tx.id}`;
+            const dt = new Date(tx.timestamp || tx.date);
+            const dStr = isNaN(dt) ? tx.date : dt.toLocaleDateString('ar-EG');
+            const tStr = isNaN(dt) ? '' : dt.toLocaleTimeString('ar-EG');
             document.getElementById('view-transaction-details-content').innerHTML = `
                 <div style="background:rgba(0,0,0,0.02); padding:12px; border-radius:8px;">
                     <p><strong>التاجر:</strong> ${tx.merchantName}</p>
                     <p><strong>نوع العملية:</strong> ${tx.type}</p>
                     <p><strong>المبلغ:</strong> ${tx.amount} ج.م</p>
-                    <p><strong>التاريخ:</strong> ${tx.date}</p>
+                    <p><strong>التاريخ:</strong> ${dStr} <span style="color:#3b82f6; font-weight:bold; margin:0 5px;">|</span> <strong>الوقت:</strong> ${tStr}</p>
                     <p><strong>الحالة:</strong> ${tx.archived ? 'أرشيف' : 'سجل نشط'}</p>
                 </div>`;
             document.getElementById('view-transaction-modal').style.display = 'flex';
@@ -1545,12 +1701,21 @@
         function switchInvoiceTab(evt, id) {
             document.querySelectorAll('#invoice-tabs-zone .tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('#invoice-tabs-zone .tab-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(id).classList.add('active'); evt.currentTarget.classList.add('active');
+            document.getElementById(id).classList.add('active');
+            if(evt && evt.currentTarget) evt.currentTarget.classList.add('active');
+            currentInvoiceTab = id;
+            try { localStorage.setItem('mstock_activeInvoiceTab', id); } catch(e) { console.error('invoiceTab storage', e); }
         }
         function switchMerchantPageTab(evt, id) {
-            document.querySelectorAll('#merchants-page .tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('#merchants-page .tab-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(id).classList.add('active'); evt.currentTarget.classList.add('active');
+            document.querySelectorAll('#merchants-page > .tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('#merchants-page > .tabs-header > .tab-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(evt && evt.currentTarget) evt.currentTarget.classList.add('active');
+            currentMerchantTab = id;
+            if (id === 'sub-tab-supply') {
+                switchTxTab(currentMerchantTxTab);
+            }
+            try { localStorage.setItem('mstock_activeMerchantTab', id); } catch(e) { console.error('merchantTab storage', e); }
         }
         function switchTxTab(id) {
             document.querySelectorAll('.tab-content-tx').forEach(c => c.style.display = 'none');
@@ -1558,6 +1723,8 @@
             document.getElementById(id).style.display = 'block';
             if(id==='tx-registry-content') document.getElementById('tx-reg-link').classList.add('active');
             else document.getElementById('tx-arc-link').classList.add('active');
+            currentMerchantTxTab = id;
+            try { localStorage.setItem('mstock_activeMerchantTxTab', id); } catch(e) { console.error('merchantTxTab storage', e); }
         }
 
         function printStockReport() {
@@ -1575,7 +1742,82 @@
         }
 
         function saveShopMetaToStorage() {
+            const shopName = document.getElementById('cfg-shop-name').value.trim();
+            const shopPhone = document.getElementById('cfg-shop-phone').value.trim();
+            const vfCash = document.getElementById('cfg-shop-vf-cash').value.trim();
+            try {
+                localStorage.setItem('mstock_shopName', shopName);
+                localStorage.setItem('mstock_shopPhone', shopPhone);
+                localStorage.setItem('mstock_vfCash', vfCash);
+            } catch (e) { console.error('saveShopMetaToStorage', e); }
             showToast("تم تحديث وحفظ بيانات المحل تلقائياً", "success");
+        }
+
+        function applyStoredSettings() {
+            const savedTheme = localStorage.getItem('mstock_theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('dark-mode-toggle').checked = true;
+                document.getElementById('light-mode-toggle').checked = false;
+            } else {
+                document.body.classList.remove('dark-mode');
+                document.getElementById('light-mode-toggle').checked = true;
+                document.getElementById('dark-mode-toggle').checked = false;
+            }
+
+            const nameInput = document.getElementById('cfg-shop-name');
+            const phoneInput = document.getElementById('cfg-shop-phone');
+            const pinToggle = document.getElementById('pin-feature-toggle');
+            const lockTimerSelect = document.getElementById('lock-timer-select');
+
+            nameInput.value = localStorage.getItem('mstock_shopName') || nameInput.value;
+            phoneInput.value = localStorage.getItem('mstock_shopPhone') || phoneInput.value;
+            const savedVF = localStorage.getItem('mstock_vfCash');
+            if(savedVF !== null) document.getElementById('cfg-shop-vf-cash').value = savedVF;
+
+            const savedPinEnabled = localStorage.getItem('mstock_pinEnabled');
+            isPinEnabled = savedPinEnabled !== null ? savedPinEnabled === '1' : true;
+            pinToggle.checked = isPinEnabled;
+            togglePinSection(isPinEnabled);
+
+            const savedPinCode = localStorage.getItem('mstock_pinCode');
+            if(savedPinCode !== null) currentPIN = savedPinCode;
+            updatePinControls();
+
+            const savedIdleLimit = localStorage.getItem('mstock_idleTimeLimit');
+            if(savedIdleLimit === 'off') idleTimeLimit = 'off';
+            else if(savedIdleLimit) idleTimeLimit = parseInt(savedIdleLimit) || idleTimeLimit;
+            lockTimerSelect.value = idleTimeLimit === 'off' ? 'off' : String(idleTimeLimit);
+
+            const savedPage = localStorage.getItem('mstock_activePage');
+            if(savedPage) currentPageId = savedPage;
+            document.getElementById(currentPageId) && switchPage(currentPageId);
+            const savedMerchantTab = localStorage.getItem('mstock_activeMerchantTab');
+            if(savedMerchantTab) {
+                currentMerchantTab = savedMerchantTab;
+                const targetTabBtn = Array.from(document.querySelectorAll('#merchants-page .tab-link')).find(btn => btn.getAttribute('onclick')?.includes(savedMerchantTab));
+                if(targetTabBtn) targetTabBtn.click();
+            }
+            const savedMerchantTxTab = localStorage.getItem('mstock_activeMerchantTxTab');
+            if(savedMerchantTxTab) {
+                currentMerchantTxTab = savedMerchantTxTab;
+                switchTxTab(savedMerchantTxTab);
+            }
+            const savedInvoiceTab = localStorage.getItem('mstock_activeInvoiceTab');
+            if(savedInvoiceTab) {
+                const tabBtn = Array.from(document.querySelectorAll('#invoice-tabs-zone .tab-link')).find(btn => btn.getAttribute('onclick')?.includes(savedInvoiceTab));
+                if(tabBtn) tabBtn.click();
+            }
+
+            const savedAutoBackup = localStorage.getItem('mstock_autoBackup');
+            if(savedAutoBackup) {
+                autoBackupInterval = savedAutoBackup;
+                document.getElementById('auto-backup-select').value = autoBackupInterval;
+                startAutoBackupTimer();
+            }
+
+            updateGDriveUI();
+            renderVfCashInputs();
         }
 
         // Persist important arrays to localStorage to avoid data loss between runs
@@ -1587,6 +1829,16 @@
                 localStorage.setItem('mstock_invoiceRegistry', JSON.stringify(invoiceRegistry));
                 localStorage.setItem('mstock_invoiceArchive', JSON.stringify(invoiceArchive));
                 localStorage.setItem('mstock_nextInvoiceId', String(nextInvoiceId));
+                localStorage.setItem('mstock_pinEnabled', isPinEnabled ? '1' : '0');
+                localStorage.setItem('mstock_pinCode', currentPIN);
+                localStorage.setItem('mstock_idleTimeLimit', idleTimeLimit === 'off' ? 'off' : String(idleTimeLimit));
+                localStorage.setItem('mstock_activePage', currentPageId);
+                localStorage.setItem('mstock_activeInvoiceTab', currentInvoiceTab);
+                localStorage.setItem('mstock_activeMerchantTab', currentMerchantTab);
+                localStorage.setItem('mstock_activeMerchantTxTab', currentMerchantTxTab);
+                localStorage.setItem('mstock_gdriveAccount', gdriveAccountName || '');
+                localStorage.setItem('mstock_gdriveFileId', gdriveBackupFileId || '');
+                localStorage.setItem('mstock_autoBackup', autoBackupInterval);
             } catch(e) { console.error('saveAppState error', e); }
         }
 
@@ -1607,20 +1859,495 @@
             } catch(e) { console.error('loadAppState error', e); }
         }
 
-        function validateLicense() {
-            const code = document.getElementById('license-input').value.trim();
-            if(code === 'MMSTOCK!') {
-                // mark activated once
-                try { localStorage.setItem('mstock_activated', '1'); } catch(e) { console.error('storage error', e); }
-                document.getElementById('activation-screen').style.display = 'none';
-                if(isPinEnabled) document.getElementById('pin-screen').style.display = 'flex';
-                startIdleTimer();
-                showToast('تم تفعيل البرنامج بنجاح', 'success');
-            } else {
-                document.getElementById('act-box').classList.add('shake-effect');
-                setTimeout(()=>document.getElementById('act-box').classList.remove('shake-effect'), 400);
-                showToast('رمز التفعيل غير صحيح', 'error');
+        function handleNewPinInput(el) {
+            const value = el.value.trim();
+            if(value.length === 4 && !isNaN(value)) {
+                currentPIN = value;
+                try { localStorage.setItem('mstock_pinCode', currentPIN); } catch (e) { console.error('handleNewPinInput', e); }
+                saveAppState();
+                updatePinControls();
+                showToast('تم حفظ رمز PIN تلقائيًا', 'success');
             }
+        }
+
+        function createNewPIN() {
+            const v = document.getElementById('set-new-pin').value.trim();
+            if(v.length === 4 && !isNaN(v)) {
+                currentPIN = v;
+                try { localStorage.setItem('mstock_pinCode', currentPIN); } catch (e) { console.error('createNewPIN', e); }
+                saveAppState();
+                updatePinControls();
+                showToast('تم حفظ الرمز الجديد تلقائيًا', 'success');
+            } else {
+                showToast('خطأ: يرجى كتابة 4 أرقام فقط!', 'error');
+            }
+        }
+
+        // ===== Google Drive OAuth2 Integration =====
+        let oauth2Client = null;
+        let gdriveService = null;
+
+        function initOAuth2Client() {
+            if (oauth2Client) return oauth2Client;
+            if (!fs.existsSync(OAUTH_CLIENT_PATH)) return null;
+            try {
+                const raw = JSON.parse(fs.readFileSync(OAUTH_CLIENT_PATH, 'utf-8'));
+                const creds = raw.installed || raw.web;
+                if (!creds) return null;
+                oauth2Client = new google.auth.OAuth2(
+                    creds.client_id,
+                    creds.client_secret,
+                    'http://localhost'
+                );
+                // لو في refresh token محفوظ، نستخدمه مباشرة
+                const savedToken = localStorage.getItem('mstock_gdriveRefreshToken');
+                if (savedToken) {
+                    oauth2Client.setCredentials({ refresh_token: savedToken });
+                }
+                return oauth2Client;
+            } catch(e) {
+                console.error('initOAuth2Client error:', e);
+                return null;
+            }
+        }
+
+        function getGDriveService() {
+            const client = initOAuth2Client();
+            if (!client) return null;
+            if (!gdriveService) {
+                gdriveService = google.drive({ version: 'v3', auth: client });
+            }
+            return gdriveService;
+        }
+
+        function updateGDriveUI() {
+            const accountDisplay = document.getElementById('gdrive-account-display');
+            const loginBtn = document.getElementById('gdrive-login-btn');
+            const logoutBtn = document.getElementById('gdrive-logout-btn');
+            const statusEl = document.getElementById('gdrive-status');
+
+            if (gdriveAccountName) {
+                accountDisplay.innerHTML = `<strong style="color: var(--accent-color);">✅ ${gdriveAccountName}</strong>`;
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-flex';
+                statusEl.innerText = 'تم تسجيل الدخول بنجاح. يمكنك رفع أو استرجاع البيانات.';
+            } else {
+                accountDisplay.innerHTML = '<strong>غير متصل بخدمة جوجل درايف</strong>';
+                loginBtn.style.display = 'inline-flex';
+                logoutBtn.style.display = 'none';
+                statusEl.innerText = 'لم يتم تسجيل الدخول أو رفع البيانات بعد.';
+            }
+        }
+
+        async function signInGoogleDrive() {
+            try {
+                if (!fs.existsSync(OAUTH_CLIENT_PATH)) {
+                    showToast('خطأ: ملف OAuth client غير موجود!', 'error');
+                    return;
+                }
+
+                const client = initOAuth2Client();
+                if (!client) {
+                    showToast('خطأ في قراءة بيانات OAuth', 'error');
+                    return;
+                }
+
+                // بناء رابط تسجيل الدخول مع اختيار الحساب
+                const authUrl = client.generateAuthUrl({
+                    access_type: 'offline',
+                    scope: [
+                        'https://www.googleapis.com/auth/drive.file',
+                        'https://www.googleapis.com/auth/userinfo.email',
+                        'https://www.googleapis.com/auth/userinfo.profile'
+                    ],
+                    prompt: 'select_account consent'
+                });
+
+                showToast('جاري فتح نافذة تسجيل دخول Google...', 'info');
+
+                // فتح نافذة تسجيل الدخول عبر main process
+                const result = await ipcRenderer.invoke('open-google-auth', authUrl);
+
+                if (result.error) {
+                    if (result.error === 'cancelled') {
+                        showToast('تم إلغاء تسجيل الدخول', 'info');
+                    } else {
+                        showToast('فشل تسجيل الدخول: ' + result.error, 'error');
+                    }
+                    return;
+                }
+
+                // تبديل الكود بـ tokens
+                const { tokens } = await client.getToken(result.code);
+                client.setCredentials(tokens);
+
+                // حفظ الـ refresh token
+                if (tokens.refresh_token) {
+                    try { localStorage.setItem('mstock_gdriveRefreshToken', tokens.refresh_token); } catch(e) {}
+                }
+
+                // الحصول على بيانات المستخدم (الاسم والإيميل)
+                const oauth2 = google.oauth2({ version: 'v2', auth: client });
+                const userInfo = await oauth2.userinfo.get();
+                gdriveAccountName = userInfo.data.email || userInfo.data.name || 'حساب Google';
+
+                try { localStorage.setItem('mstock_gdriveAccount', gdriveAccountName); } catch(e) {}
+
+                gdriveService = null; // Reset to recreate with new auth
+                updateGDriveUI();
+                saveAppState();
+                showToast('تم تسجيل الدخول بنجاح: ' + gdriveAccountName, 'success');
+
+            } catch(err) {
+                console.error('Google OAuth sign-in error:', err);
+                showToast('فشل تسجيل الدخول: ' + (err.message || 'خطأ غير معروف'), 'error');
+            }
+        }
+
+        function signOutGoogleDrive() {
+            gdriveAccountName = null;
+            gdriveBackupFileId = null;
+            oauth2Client = null;
+            gdriveService = null;
+            try {
+                localStorage.removeItem('mstock_gdriveAccount');
+                localStorage.removeItem('mstock_gdriveFileId');
+                localStorage.removeItem('mstock_gdriveRefreshToken');
+            } catch(e) { console.error('gdrive logout storage', e); }
+            updateGDriveUI();
+            saveAppState();
+            showToast('تم تسجيل الخروج وحذف بيانات الحساب', 'info');
+        }
+
+        async function ensureGDriveAuth() {
+            const client = initOAuth2Client();
+            if (!client) return false;
+            const savedToken = localStorage.getItem('mstock_gdriveRefreshToken');
+            if (!savedToken) return false;
+            try {
+                // تجديد الـ token تلقائياً
+                const { credentials } = await client.refreshAccessToken();
+                client.setCredentials(credentials);
+                return true;
+            } catch(e) {
+                console.error('Token refresh failed:', e);
+                // الـ token منتهي - محتاج تسجيل دخول جديد
+                gdriveAccountName = null;
+                try { localStorage.removeItem('mstock_gdriveRefreshToken'); } catch(ex) {}
+                updateGDriveUI();
+                return false;
+            }
+        }
+
+        async function uploadAppDataToDrive() {
+            if (!gdriveAccountName) {
+                showToast('يرجى تسجيل الدخول أولاً قبل رفع البيانات', 'error');
+                return;
+            }
+            const statusEl = document.getElementById('gdrive-status');
+            statusEl.innerText = '⏳ جاري رفع البيانات إلى جوجل درايف...';
+
+            try {
+                if (!(await ensureGDriveAuth())) {
+                    showToast('انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى', 'error');
+                    statusEl.innerText = '⚠️ انتهت الجلسة. سجل دخول مرة أخرى.';
+                    return;
+                }
+
+                const drive = getGDriveService();
+                if (!drive) { showToast('خطأ في الاتصال بجوجل درايف', 'error'); return; }
+
+                // تجهيز بيانات النسخة الاحتياطية
+                const backupData = {
+                    version: '1.0',
+                    timestamp: new Date().toISOString(),
+                    account: gdriveAccountName,
+                    stockProducts,
+                    merchantsList,
+                    merchantTransactions,
+                    invoiceRegistry,
+                    invoiceArchive,
+                    nextInvoiceId,
+                    settings: {
+                        shopName: document.getElementById('cfg-shop-name').value,
+                        shopPhone: document.getElementById('cfg-shop-phone').value,
+                        vfCash: document.getElementById('cfg-shop-vf-cash').value,
+                        pinEnabled: isPinEnabled,
+                        pinCode: currentPIN,
+                        idleTimeLimit: idleTimeLimit
+                    }
+                };
+
+                const jsonStr = JSON.stringify(backupData, null, 2);
+
+                // البحث عن نسخة سابقة
+                if (gdriveBackupFileId) {
+                    try {
+                        await drive.files.update({ fileId: gdriveBackupFileId, media: { mimeType: 'application/json', body: jsonStr } });
+                        const now = new Date();
+                        statusEl.innerText = `✅ تم تحديث النسخة الاحتياطية - ${now.toLocaleTimeString('ar-EG')} ${now.toLocaleDateString('ar-EG')}`;
+                        showToast('تم تحديث النسخة الاحتياطية بنجاح', 'success');
+                        return;
+                    } catch(e) {
+                        console.warn('Update failed, creating new:', e.message);
+                        gdriveBackupFileId = null;
+                    }
+                }
+
+                // البحث بالاسم
+                const searchRes = await drive.files.list({
+                    q: `name = '${DRIVE_FILE_NAME}' and trashed = false`,
+                    fields: 'files(id, name)',
+                });
+
+                if (searchRes.data.files && searchRes.data.files.length > 0) {
+                    const oldId = searchRes.data.files[0].id;
+                    try { await drive.files.delete({ fileId: oldId }); } catch(e) {}
+                }
+
+                // رفع ملف جديد
+                const createRes = await drive.files.create({
+                    resource: { name: DRIVE_FILE_NAME },
+                    media: { mimeType: 'application/json', body: jsonStr },
+                    fields: 'id',
+                });
+
+                gdriveBackupFileId = createRes.data.id;
+                try { localStorage.setItem('mstock_gdriveFileId', gdriveBackupFileId); } catch(e) {}
+                saveAppState();
+
+                const now = new Date();
+                statusEl.innerText = `✅ تم رفع النسخة الاحتياطية بنجاح - ${now.toLocaleTimeString('ar-EG')} ${now.toLocaleDateString('ar-EG')}`;
+                showToast('تم رفع البيانات بنجاح على جوجل درايف', 'success');
+
+            } catch(err) {
+                console.error('Upload error:', err);
+                statusEl.innerText = '❌ فشل رفع البيانات: ' + (err.message || 'خطأ');
+                showToast('فشل رفع البيانات: ' + (err.message || 'خطأ'), 'error');
+            }
+        }
+
+        async function restoreAppDataFromDrive() {
+            if (!gdriveAccountName) {
+                showToast('يرجى تسجيل الدخول أولاً قبل استرجاع البيانات', 'error');
+                return;
+            }
+            const statusEl = document.getElementById('gdrive-status');
+            statusEl.innerText = '⏳ جاري استرجاع البيانات من جوجل درايف...';
+
+            try {
+                if (!(await ensureGDriveAuth())) {
+                    showToast('انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى', 'error');
+                    statusEl.innerText = '⚠️ انتهت الجلسة. سجل دخول مرة أخرى.';
+                    return;
+                }
+
+                const drive = getGDriveService();
+                if (!drive) { showToast('خطأ في الاتصال بجوجل درايف', 'error'); return; }
+
+                // البحث عن ملف النسخة
+                let fileId = gdriveBackupFileId;
+                if (!fileId) {
+                    const searchRes = await drive.files.list({
+                        q: `name = '${DRIVE_FILE_NAME}' and trashed = false`,
+                        fields: 'files(id, name)',
+                    });
+                    if (!searchRes.data.files || searchRes.data.files.length === 0) {
+                        statusEl.innerText = '⚠️ لا توجد نسخة احتياطية على جوجل درايف';
+                        showToast('لا توجد نسخة احتياطية للاسترجاع', 'error');
+                        return;
+                    }
+                    fileId = searchRes.data.files[0].id;
+                }
+
+                // تنزيل الملف
+                const response = await drive.files.get({ fileId, alt: 'media' });
+                let backupData;
+                if (typeof response.data === 'object' && response.data !== null && !(response.data instanceof ArrayBuffer) && !Buffer.isBuffer(response.data)) {
+                    // البيانات جاهزة كـ object
+                    backupData = response.data;
+                } else if (response.data instanceof ArrayBuffer || Buffer.isBuffer(response.data)) {
+                    const textContent = Buffer.from(response.data).toString('utf-8');
+                    backupData = JSON.parse(textContent);
+                } else if (typeof response.data === 'string') {
+                    backupData = JSON.parse(response.data);
+                } else {
+                    backupData = response.data;
+                }
+
+                // استرجاع البيانات
+                if (backupData.stockProducts) stockProducts = backupData.stockProducts;
+                if (backupData.merchantsList) merchantsList = backupData.merchantsList;
+                if (backupData.merchantTransactions) merchantTransactions = backupData.merchantTransactions;
+                if (backupData.invoiceRegistry) invoiceRegistry = backupData.invoiceRegistry;
+                if (backupData.invoiceArchive) invoiceArchive = backupData.invoiceArchive;
+                if (backupData.nextInvoiceId) nextInvoiceId = backupData.nextInvoiceId;
+
+                if (backupData.settings) {
+                    const s = backupData.settings;
+                    if (s.shopName) document.getElementById('cfg-shop-name').value = s.shopName;
+                    if (s.shopPhone) document.getElementById('cfg-shop-phone').value = s.shopPhone;
+                    if (s.vfCash !== undefined) document.getElementById('cfg-shop-vf-cash').value = s.vfCash;
+                    if (s.pinEnabled !== undefined) { isPinEnabled = s.pinEnabled; document.getElementById('pin-feature-toggle').checked = isPinEnabled; }
+                    if (s.pinCode !== undefined) currentPIN = s.pinCode;
+                    if (s.idleTimeLimit !== undefined) {
+                        idleTimeLimit = s.idleTimeLimit;
+                        document.getElementById('lock-timer-select').value = idleTimeLimit === 'off' ? 'off' : String(idleTimeLimit);
+                    }
+                }
+
+                gdriveBackupFileId = fileId;
+                try { localStorage.setItem('mstock_gdriveFileId', fileId); } catch(e) {}
+
+                // إعادة عرض كل شيء
+                saveAppState();
+                renderStockTable();
+                renderInvoiceTables();
+                renderMerchantsTable();
+                renderTxTable();
+                renderVfCashInputs();
+                updatePinControls();
+                calculateFinancialReports();
+
+                const now = new Date();
+                statusEl.innerText = `✅ تم استرجاع البيانات بنجاح - ${now.toLocaleTimeString('ar-EG')} ${now.toLocaleDateString('ar-EG')}`;
+                showToast('تم استرجاع البيانات من جوجل درايف بنجاح!', 'success');
+
+            } catch(err) {
+                console.error('Restore error:', err);
+                statusEl.innerText = '❌ فشل استرجاع البيانات: ' + (err.message || 'خطأ');
+                showToast('فشل استرجاع البيانات: ' + (err.message || 'خطأ'), 'error');
+            }
+        }
+
+        async function validateSupabaseLicense() {
+            if (!navigator.onLine) {
+                const s = document.getElementById('activation-status');
+                s.innerText = 'خطأ: مطلوب اتصال بالإنترنت في أول تفعيل!';
+                s.style.color = '#ef4444';
+                return;
+            }
+            const name = document.getElementById('license-client-name').value.trim();
+            const code = document.getElementById('license-input').value.trim();
+            if (!name || !code) {
+                const s = document.getElementById('activation-status');
+                s.innerText = 'يرجى إدخال اسمك وكود التفعيل!';
+                s.style.color = '#ef4444';
+                return;
+            }
+            
+            const s = document.getElementById('activation-status');
+            s.innerText = 'جاري الاتصال بالسيرفر والتحقق من الرخصة...';
+            s.style.color = '#3b82f6';
+
+            try {
+                const { data, error } = await supabase.from('licenses').select('*').eq('hardware_id', HWID).single();
+                
+                if (data) {
+                    if (data.is_active === false) {
+                        s.innerText = 'عذراً، تم حظر هذا الجهاز من قبل المسؤول.';
+                        s.style.color = '#ef4444';
+                        document.getElementById('act-box').classList.add('shake-effect');
+                        setTimeout(()=>document.getElementById('act-box').classList.remove('shake-effect'), 400);
+                        return;
+                    }
+                    if (data.activation_code !== code) {
+                        s.innerText = 'كود التفعيل المدخل غير صحيح.';
+                        s.style.color = '#ef4444';
+                        document.getElementById('act-box').classList.add('shake-effect');
+                        setTimeout(()=>document.getElementById('act-box').classList.remove('shake-effect'), 400);
+                        return;
+                    }
+                    // نجاح
+                    saveLocalLicense(name, code);
+                } else {
+                    // جهاز جديد كلياً
+                    const { error: insertError } = await supabase.from('licenses').insert([
+                        { hardware_id: HWID, client_name: name, activation_code: code, is_active: true, activated_at: new Date().toISOString() }
+                    ]);
+                    if (insertError) throw insertError;
+                    saveLocalLicense(name, code);
+                }
+            } catch (err) {
+                s.innerText = 'خطأ: ' + (err.message || 'راجع اتصالك بالإنترنت والـ API Key');
+                s.style.color = '#ef4444';
+                console.error(err);
+            }
+        }
+
+        function saveLocalLicense(name, code) {
+            const licenseData = JSON.stringify({ hwid: HWID, name, code, activated_at: Date.now() });
+            fs.writeFileSync(LICENSE_PATH, encrypt(licenseData));
+            document.getElementById('activation-screen').style.display = 'none';
+            if(isPinEnabled && currentPIN) document.getElementById('pin-screen').style.display = 'flex';
+            startIdleTimer();
+            startBackgroundLicenseSync();
+            showToast('تم تفعيل البرنامج وربطه بالسيرفر بنجاح!', 'success');
+        }
+
+        function checkLicenseOnStartup() {
+            if (fs.existsSync(LICENSE_PATH)) {
+                const encrypted = fs.readFileSync(LICENSE_PATH, 'utf8');
+                const decrypted = decrypt(encrypted);
+                if (decrypted) {
+                    const data = JSON.parse(decrypted);
+                    if (data.hwid === HWID) {
+                        // مرخص محلياً، يمكنه الدخول حتى لو اوفلاين
+                        document.getElementById('activation-screen').style.display = 'none';
+                        if(isPinEnabled && currentPIN) document.getElementById('pin-screen').style.display = 'flex';
+                        startIdleTimer();
+                        startBackgroundLicenseSync();
+                        return;
+                    }
+                }
+            }
+            // غير مرخص أو متلاعب به
+            document.getElementById('activation-screen').style.display = 'flex';
+        }
+
+        function startBackgroundLicenseSync() {
+            // الاستماع الفوري للتحديثات عبر Supabase Realtime
+            supabase.channel('license-updates')
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'licenses', filter: `hardware_id=eq.${HWID}` }, payload => {
+                    const isActive = payload.new.is_active;
+                    if (isActive === false) {
+                        // حظر فوري
+                        if (fs.existsSync(LICENSE_PATH)) fs.unlinkSync(LICENSE_PATH);
+                        document.getElementById('activation-screen').style.display = 'flex';
+                        const s = document.getElementById('activation-status');
+                        s.innerText = 'تم إلغاء صلاحية وصولك من قبل المسؤول الآن!';
+                        s.style.color = '#ef4444';
+                        document.getElementById('pin-screen').style.display = 'none';
+                        showToast('تم حظر الوصول من قبل المسؤول', 'error');
+                    } else if (isActive === true && document.getElementById('activation-screen').style.display !== 'none') {
+                        // إعادة تفعيل فورية لو كان عالق في شاشة التفعيل
+                        const name = document.getElementById('license-client-name').value || payload.new.client_name || 'العميل';
+                        const code = payload.new.activation_code;
+                        const licenseData = JSON.stringify({ hwid: HWID, name, code, activated_at: Date.now() });
+                        fs.writeFileSync(LICENSE_PATH, encrypt(licenseData));
+                        document.getElementById('activation-screen').style.display = 'none';
+                        showToast('تمت إعادة تفعيل حسابك من قبل الإدارة!', 'success');
+                        if(isPinEnabled && currentPIN) document.getElementById('pin-screen').style.display = 'flex';
+                        document.getElementById('activation-status').innerText = '';
+                    }
+                })
+                .subscribe();
+
+            // فحص دوري كل 24 ساعة كإجراء احتياطي
+            setInterval(async () => {
+                if (!navigator.onLine) return;
+                try {
+                    const { data, error } = await supabase.from('licenses').select('is_active').eq('hardware_id', HWID).single();
+                    if (data && data.is_active === false) {
+                        if (fs.existsSync(LICENSE_PATH)) fs.unlinkSync(LICENSE_PATH);
+                        document.getElementById('activation-screen').style.display = 'flex';
+                        const s = document.getElementById('activation-status');
+                        s.innerText = 'تم إلغاء صلاحية وصولك من قبل المسؤول.';
+                        s.style.color = '#ef4444';
+                        document.getElementById('pin-screen').style.display = 'none';
+                    }
+                } catch (e) { console.error('Sync check failed:', e); }
+            }, 24 * 60 * 60 * 1000);
         }
 
         function validatePIN() {
@@ -1633,16 +2360,53 @@
             }
         }
 
-        function createNewPIN() {
-            const v = document.getElementById('set-new-pin').value.trim();
-            if(v.length === 4 && !isNaN(v)) { currentPIN = v; updatePinControls(); showToast("تم حفظ الرمز الجديد تلقائياً", "success"); }
-            else showToast("خطأ: يرجى كتابة 4 أرقام فقط!", "error");
+        function clearSavedPIN() {
+            document.getElementById('set-new-pin').value = '';
+            currentPIN = "";
+            isPinEnabled = false;
+            document.getElementById('pin-feature-toggle').checked = false;
+            document.getElementById('dynamic-pin-section').style.display = 'none';
+            try { localStorage.removeItem('mstock_pinCode'); } catch(e) { console.error('clearSavedPIN', e); }
+            saveAppState();
+            updatePinControls();
+            showToast("تم حذف رمز الـ PIN الحماية", "info");
         }
-        function clearSavedPIN() { document.getElementById('set-new-pin').value = ''; currentPIN = ""; updatePinControls(); showToast("تم حذف رمز الـ PIN الحماية", "info"); }
+
+        function updateAutoBackup() {
+            autoBackupInterval = document.getElementById('auto-backup-select').value;
+            saveAppState();
+            startAutoBackupTimer();
+            showToast('تم حفظ إعداد المزامنة التلقائية', 'success');
+        }
+
+        function startAutoBackupTimer() {
+            if (autoBackupTimer) clearInterval(autoBackupTimer);
+            if (autoBackupInterval !== 'off') {
+                const ms = parseInt(autoBackupInterval) * 60 * 1000;
+                autoBackupTimer = setInterval(() => {
+                    if (gdriveAccountName) {
+                        const originalText = document.getElementById('gdrive-status').innerText;
+                        document.getElementById('gdrive-status').innerText = '⏳ مزامنة تلقائية قيد التنفيذ...';
+                        uploadAppDataToDrive().then(() => {
+                            if (!document.getElementById('gdrive-status').innerText.includes('خطأ')) {
+                                document.getElementById('gdrive-status').innerText += ' (تلقائي)';
+                            }
+                        }).catch(() => {
+                            document.getElementById('gdrive-status').innerText = originalText;
+                        });
+                    }
+                }, ms);
+            }
+        }
 
         function updatePinControls() {
             const btn = document.getElementById('clear-pin-btn');
+            const pinInputRow = document.getElementById('set-new-pin').closest('.form-control');
             if(btn) btn.style.display = currentPIN ? 'inline-flex' : 'none';
+            // إخفاء خانة الرمز لو الرمز محذوف والحماية مقفولة
+            if(pinInputRow) {
+                pinInputRow.style.display = (!currentPIN && !isPinEnabled) ? 'none' : 'flex';
+            }
         }
 
         function startIdleTimer() {
@@ -1659,16 +2423,11 @@
         window.onload = function() {
             // load persisted data first
             loadAppState();
+            applyStoredSettings();
             renderStockTable(); renderInvoiceTables(); renderMerchantsTable(); renderTxTable(); renderVfCashInputs(); updatePinControls(); calculateFinancialReports();
 
-            // show activation screen only once (first run)
-            const activated = (function(){ try { return localStorage.getItem('mstock_activated'); } catch(e){ return null; } })();
-            if(!activated) {
-                document.getElementById('activation-screen').style.display = 'flex';
-            } else {
-                if(isPinEnabled) document.getElementById('pin-screen').style.display = 'flex';
-                startIdleTimer();
-            }
+            // Show activation screen or login depending on Supabase HWID License file
+            checkLicenseOnStartup();
 
             // autosave periodically and on exit
             window.addEventListener('beforeunload', () => { saveAppState(); });
@@ -1676,23 +2435,48 @@
         };
 
         function handleThemeSwitch(mode) {
+            const lightToggle = document.getElementById('light-mode-toggle');
+            const darkToggle = document.getElementById('dark-mode-toggle');
+            
             if(mode === 'light') {
-                document.getElementById('dark-mode-toggle').checked = false;
-                document.body.classList.remove('dark-mode');
+                if (lightToggle.checked) {
+                    darkToggle.checked = false;
+                    document.body.classList.remove('dark-mode');
+                } else {
+                    darkToggle.checked = true;
+                    document.body.classList.add('dark-mode');
+                }
             } else {
-                document.getElementById('light-mode-toggle').checked = false;
-                document.body.classList.add('dark-mode');
+                if (darkToggle.checked) {
+                    lightToggle.checked = false;
+                    document.body.classList.add('dark-mode');
+                } else {
+                    lightToggle.checked = true;
+                    document.body.classList.remove('dark-mode');
+                }
             }
+            try { localStorage.setItem('mstock_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); } catch(e) {}
         }
 
         function togglePinSection(checked) {
             isPinEnabled = checked;
-            document.getElementById('dynamic-pin-section').style.display = checked ? 'block' : 'none';
+            const dynamicSection = document.getElementById('dynamic-pin-section');
+            if(!checked) {
+                dynamicSection.style.display = 'none';
+            } else {
+                dynamicSection.style.display = 'block';
+            }
+            saveAppState();
         }
 
         function updateTimerSettings() {
             const v = document.getElementById('lock-timer-select').value;
             idleTimeLimit = v === 'off' ? 'off' : parseInt(v);
+            try {
+                localStorage.setItem('mstock_idleTimeLimit', idleTimeLimit === 'off' ? 'off' : String(idleTimeLimit));
+            } catch(e) { console.error('updateTimerSettings', e); }
+            saveAppState();
+            showToast('تم حفظ إعدادات المؤقت', 'success');
         }
 
         function switchPage(pageId) {
@@ -1703,6 +2487,24 @@
             if(pageId === 'stock-page') document.getElementById('menu-stock').classList.add('active');
             if(pageId === 'merchants-page') document.getElementById('menu-merchants').classList.add('active');
             if(pageId === 'settings-page') document.getElementById('menu-settings').classList.add('active');
+            currentPageId = pageId;
+
+            // تصفير خانات البحث
+            const posSearch = document.getElementById('pos-search-product-input');
+            if(posSearch) {
+                posSearch.value = '';
+                posSearch.removeAttribute('data-selectedId');
+            }
+            const posInfo = document.getElementById('pos-selected-product-info');
+            if(posInfo) posInfo.style.display = 'none';
+            const posPrice = document.getElementById('pos-item-price');
+            if(posPrice) posPrice.value = '';
+
+            const stockSearch = document.getElementById('stock-search-input');
+            if(stockSearch) stockSearch.value = '';
+            if(typeof filterStockTable === 'function') filterStockTable();
+
+            saveAppState();
         }
     </script>
 </body>

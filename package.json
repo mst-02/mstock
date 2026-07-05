@@ -5,7 +5,10 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "start:admin": "electron admin/main.js",
     "build": "electron-builder --win nsis --x64 --publish never",
+    "build:admin": "electron-builder --config electron-builder-admin.json --win nsis --x64 --publish never",
+    "build:all": "npm run build && npm run build:admin",
     "dist": "electron-builder"
   },
   "keywords": [],
@@ -13,7 +16,9 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.0",
     "googleapis": "^140.0.0",
+    "node-machine-id": "^1.1.12",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7"
   },
