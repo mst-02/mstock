@@ -16,6 +16,10 @@
             --sidebar-width: 240px;
         }
 
+        td.no-print {
+            white-space: nowrap;
+        }
+
         body.dark-mode {
             --primary-color: #0f172a;
             --accent-color: #10b981;
@@ -2363,9 +2367,6 @@
         function clearSavedPIN() {
             document.getElementById('set-new-pin').value = '';
             currentPIN = "";
-            isPinEnabled = false;
-            document.getElementById('pin-feature-toggle').checked = false;
-            document.getElementById('dynamic-pin-section').style.display = 'none';
             try { localStorage.removeItem('mstock_pinCode'); } catch(e) { console.error('clearSavedPIN', e); }
             saveAppState();
             updatePinControls();
@@ -2476,6 +2477,7 @@
                 localStorage.setItem('mstock_idleTimeLimit', idleTimeLimit === 'off' ? 'off' : String(idleTimeLimit));
             } catch(e) { console.error('updateTimerSettings', e); }
             saveAppState();
+            resetIdleTimer();
             showToast('تم حفظ إعدادات المؤقت', 'success');
         }
 
