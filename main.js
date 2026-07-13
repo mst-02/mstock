@@ -68,17 +68,32 @@ ipcMain.handle('open-google-auth', async (event, authUrl) => {
     });
 });
 
-// تشغيل النافذة أول ما الـ Electron يجهز
-app.whenReady().then(() => {
-    Menu.setApplicationMenu(null);
-    createMainWindow();
+// تأمين التطبيق ليعمل في نافذة واحدة فقط لمنع تعليق قاعدة البيانات والشاشة البيضاء
+const gotTheLock = app.requestSingleInstanceLock();
 
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+if (!gotTheLock) {
+    app.quit();
+} else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        // عند محاولة فتح نسخة ثانية، نبرز النسخة الأولى
+        const windows = BrowserWindow.getAllWindows();
+        if (windows.length > 0) {
+            if (windows[0].isMinimized()) windows[0].restore();
+            windows[0].focus();
+        }
     });
-});
 
-// قفل البرنامج تماماً لما تقفل النافذة
+    app.whenReady().then(() => {
+        Menu.setApplicationMenu(null);
+        createMainWindow();
+
+        app.on('activate', () => {
+            if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
+        });
+    });
+}
+
+// قفل البرنامج عند إغلاق كل النوافذ
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });

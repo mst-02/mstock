@@ -43,6 +43,12 @@
       "artifactName": "Mstock-${version}-${arch}.${ext}",
       "icon": "build/icon.ico"
     },
+    "files": [
+      "**/*",
+      "!admin",
+      "!admin/**/*",
+      "!electron-builder-admin.json"
+    ],
     "nsis": {
       "oneClick": false,
       "perMachine": false,

@@ -779,6 +779,8 @@
         const { google } = require('googleapis');
         const fs = require('fs');
         const path = require('path');
+        const os = require('os');
+        const dbPath = path.join(os.homedir(), 'mstock_local_db.json');
         const { createClient } = require('@supabase/supabase-js');
         const { machineIdSync } = require('node-machine-id');
         const crypto = require('crypto');
@@ -1758,6 +1760,21 @@
         }
 
         function applyStoredSettings() {
+            // أولاً: تحميل كل المتغيرات من التخزين لتجنب الكتابة فوقها بالقيم الافتراضية إذا تم استدعاء saveAppState مبكراً
+            const savedIdleLimit = localStorage.getItem('mstock_idleTimeLimit');
+            if(savedIdleLimit === 'off') idleTimeLimit = 'off';
+            else if(savedIdleLimit) idleTimeLimit = parseInt(savedIdleLimit) || idleTimeLimit;
+
+            const savedAutoBackup = localStorage.getItem('mstock_autoBackup');
+            if(savedAutoBackup) autoBackupInterval = savedAutoBackup;
+
+            const savedPinCode = localStorage.getItem('mstock_pinCode');
+            if(savedPinCode !== null) currentPIN = savedPinCode;
+
+            const savedPinEnabled = localStorage.getItem('mstock_pinEnabled');
+            isPinEnabled = savedPinEnabled !== null ? savedPinEnabled === '1' : true;
+
+            // ثانياً: تطبيق التغييرات على واجهة المستخدم
             const savedTheme = localStorage.getItem('mstock_theme');
             if (savedTheme === 'dark') {
                 document.body.classList.add('dark-mode');
@@ -1779,43 +1796,36 @@
             const savedVF = localStorage.getItem('mstock_vfCash');
             if(savedVF !== null) document.getElementById('cfg-shop-vf-cash').value = savedVF;
 
-            const savedPinEnabled = localStorage.getItem('mstock_pinEnabled');
-            isPinEnabled = savedPinEnabled !== null ? savedPinEnabled === '1' : true;
             pinToggle.checked = isPinEnabled;
-            togglePinSection(isPinEnabled);
-
-            const savedPinCode = localStorage.getItem('mstock_pinCode');
-            if(savedPinCode !== null) currentPIN = savedPinCode;
+            togglePinSection(isPinEnabled); // هذا السطر يستدعي saveAppState
             updatePinControls();
 
-            const savedIdleLimit = localStorage.getItem('mstock_idleTimeLimit');
-            if(savedIdleLimit === 'off') idleTimeLimit = 'off';
-            else if(savedIdleLimit) idleTimeLimit = parseInt(savedIdleLimit) || idleTimeLimit;
             lockTimerSelect.value = idleTimeLimit === 'off' ? 'off' : String(idleTimeLimit);
 
             const savedPage = localStorage.getItem('mstock_activePage');
             if(savedPage) currentPageId = savedPage;
             document.getElementById(currentPageId) && switchPage(currentPageId);
+
             const savedMerchantTab = localStorage.getItem('mstock_activeMerchantTab');
             if(savedMerchantTab) {
                 currentMerchantTab = savedMerchantTab;
                 const targetTabBtn = Array.from(document.querySelectorAll('#merchants-page .tab-link')).find(btn => btn.getAttribute('onclick')?.includes(savedMerchantTab));
                 if(targetTabBtn) targetTabBtn.click();
             }
+
             const savedMerchantTxTab = localStorage.getItem('mstock_activeMerchantTxTab');
             if(savedMerchantTxTab) {
                 currentMerchantTxTab = savedMerchantTxTab;
                 switchTxTab(savedMerchantTxTab);
             }
+
             const savedInvoiceTab = localStorage.getItem('mstock_activeInvoiceTab');
             if(savedInvoiceTab) {
                 const tabBtn = Array.from(document.querySelectorAll('#invoice-tabs-zone .tab-link')).find(btn => btn.getAttribute('onclick')?.includes(savedInvoiceTab));
                 if(tabBtn) tabBtn.click();
             }
 
-            const savedAutoBackup = localStorage.getItem('mstock_autoBackup');
             if(savedAutoBackup) {
-                autoBackupInterval = savedAutoBackup;
                 document.getElementById('auto-backup-select').value = autoBackupInterval;
                 startAutoBackupTimer();
             }
@@ -1827,11 +1837,7 @@
         // Persist important arrays to localStorage to avoid data loss between runs
         function saveAppState() {
             try {
-                localStorage.setItem('mstock_stockProducts', JSON.stringify(stockProducts));
-                localStorage.setItem('mstock_merchantsList', JSON.stringify(merchantsList));
-                localStorage.setItem('mstock_merchantTransactions', JSON.stringify(merchantTransactions));
-                localStorage.setItem('mstock_invoiceRegistry', JSON.stringify(invoiceRegistry));
-                localStorage.setItem('mstock_invoiceArchive', JSON.stringify(invoiceArchive));
+                // حفظ الإعدادات الخفيفة في localStorage
                 localStorage.setItem('mstock_nextInvoiceId', String(nextInvoiceId));
                 localStorage.setItem('mstock_pinEnabled', isPinEnabled ? '1' : '0');
                 localStorage.setItem('mstock_pinCode', currentPIN);
@@ -1843,23 +1849,57 @@
                 localStorage.setItem('mstock_gdriveAccount', gdriveAccountName || '');
                 localStorage.setItem('mstock_gdriveFileId', gdriveBackupFileId || '');
                 localStorage.setItem('mstock_autoBackup', autoBackupInterval);
+
+                // حفظ البيانات الثقيلة في ملف محلي بطريقة آمنة (Atomic Write) لتجنب تلف الملف عند انقطاع الكهرباء
+                const heavyData = {
+                    stockProducts,
+                    merchantsList,
+                    merchantTransactions,
+                    invoiceRegistry,
+                    invoiceArchive
+                };
+                const tempPath = dbPath + '.tmp';
+                fs.writeFileSync(tempPath, JSON.stringify(heavyData), 'utf8');
+                fs.renameSync(tempPath, dbPath);
             } catch(e) { console.error('saveAppState error', e); }
         }
 
         function loadAppState() {
             try {
-                const sp = localStorage.getItem('mstock_stockProducts');
-                const ml = localStorage.getItem('mstock_merchantsList');
-                const mt = localStorage.getItem('mstock_merchantTransactions');
-                const ir = localStorage.getItem('mstock_invoiceRegistry');
-                const ia = localStorage.getItem('mstock_invoiceArchive');
+                // استرجاع البيانات الثقيلة من الملف المحلي إن وُجد
+                if (fs.existsSync(dbPath)) {
+                    const heavyData = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+                    if(heavyData.stockProducts) stockProducts = heavyData.stockProducts;
+                    if(heavyData.merchantsList) merchantsList = heavyData.merchantsList;
+                    if(heavyData.merchantTransactions) merchantTransactions = heavyData.merchantTransactions;
+                    if(heavyData.invoiceRegistry) invoiceRegistry = heavyData.invoiceRegistry;
+                    if(heavyData.invoiceArchive) invoiceArchive = heavyData.invoiceArchive;
+                } else {
+                    // للتوافق مع الإصدارات الأقدم (استيراد من localStorage)
+                    const sp = localStorage.getItem('mstock_stockProducts');
+                    const ml = localStorage.getItem('mstock_merchantsList');
+                    const mt = localStorage.getItem('mstock_merchantTransactions');
+                    const ir = localStorage.getItem('mstock_invoiceRegistry');
+                    const ia = localStorage.getItem('mstock_invoiceArchive');
+                    if(sp) stockProducts = JSON.parse(sp);
+                    if(ml) merchantsList = JSON.parse(ml);
+                    if(mt) merchantTransactions = JSON.parse(mt);
+                    if(ir) invoiceRegistry = JSON.parse(ir);
+                    if(ia) invoiceArchive = JSON.parse(ia);
+                }
+
                 const ni = localStorage.getItem('mstock_nextInvoiceId');
-                if(sp) stockProducts = JSON.parse(sp);
-                if(ml) merchantsList = JSON.parse(ml);
-                if(mt) merchantTransactions = JSON.parse(mt);
-                if(ir) invoiceRegistry = JSON.parse(ir);
-                if(ia) invoiceArchive = JSON.parse(ia);
                 if(ni) nextInvoiceId = parseInt(ni) || nextInvoiceId;
+
+                // إجراء وقائي: التأكد من أن رقم الفاتورة القادم أكبر من أي فاتورة مسجلة لتجنب التكرار
+                let maxId = 1000;
+                [...invoiceRegistry, ...invoiceArchive].forEach(inv => {
+                    if (inv.id > maxId) maxId = inv.id;
+                });
+                if (maxId >= nextInvoiceId) {
+                    nextInvoiceId = maxId + 1;
+                }
+
             } catch(e) { console.error('loadAppState error', e); }
         }
 
