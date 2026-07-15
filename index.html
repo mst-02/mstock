@@ -790,7 +790,7 @@
         const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         const HWID = machineIdSync();
         const ENCRYPTION_KEY = crypto.scryptSync('Mstock-Super-Secret-Key-2026', 'salt', 32);
-        const LICENSE_PATH = path.join(__dirname, 'license.dat');
+        const LICENSE_PATH = path.join(os.homedir(), 'mstock_license.dat');
 
         function encrypt(text) {
             const iv = crypto.randomBytes(16);
