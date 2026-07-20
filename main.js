@@ -1,5 +1,6 @@
 const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const path = require('path');
+const { autoUpdater } = require('electron-updater');
 
 function createMainWindow() {
     // إنشاء نافذة البرنامج بمقاس مناسب لشاشات الكاشير
@@ -86,6 +87,9 @@ if (!gotTheLock) {
     app.whenReady().then(() => {
         Menu.setApplicationMenu(null);
         createMainWindow();
+        
+        // التحقق من التحديثات عند بدء التشغيل
+        autoUpdater.checkForUpdatesAndNotify();
 
         app.on('activate', () => {
             if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
@@ -96,4 +100,14 @@ if (!gotTheLock) {
 // قفل البرنامج عند إغلاق كل النوافذ
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
+});
+
+// IPC Handler للبحث عن تحديثات يدوياً من الواجهة
+ipcMain.handle('check-for-updates', async () => {
+    try {
+        const result = await autoUpdater.checkForUpdates();
+        return result;
+    } catch (error) {
+        return { error: error.message };
+    }
 });

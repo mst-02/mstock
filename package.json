@@ -17,6 +17,7 @@
   "type": "commonjs",
   "dependencies": {
     "@supabase/supabase-js": "^2.110.0",
+    "electron-updater": "^6.8.9",
     "googleapis": "^140.0.0",
     "node-machine-id": "^1.1.12",
     "sqlite": "^5.1.1",
@@ -54,6 +55,13 @@
       "perMachine": false,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "mst-02",
+        "repo": "mstock"
+      }
+    ]
   }
 }
