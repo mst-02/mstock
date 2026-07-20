@@ -211,6 +211,16 @@
         const { createClient } = require('@supabase/supabase-js');
         const crypto = require('crypto');
 
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         function verifyAdminLogin() {
             const user = document.getElementById('admin-username').value;
             const pass = document.getElementById('admin-password').value;
@@ -272,7 +282,7 @@
                 const shortHwid = license.hardware_id.substring(0, 8) + '...';
                 
                 tr.innerHTML = `
-                    <td><strong>${license.client_name}</strong></td>
+                    <td><strong>${escapeHTML(license.client_name)}</strong></td>
                     <td>
                         <div class="code-container" dir="ltr">
                             <button class="eye-btn" onclick="toggleCodeVisibility('code-${index}', this)" title="إظهار/إخفاء الكود">
