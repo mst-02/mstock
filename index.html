@@ -110,6 +110,28 @@
             background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
             display: none; justify-content: center; align-items: center; z-index: 999;
         }
+        /* modal class for tasfeya view - always fixed on top of everything */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 1100;
+        }
+        .modal .modal-content {
+            background: var(--card-bg); color: var(--text-main);
+            padding: 25px; border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border: 1px solid #cbd5e1;
+            max-height: 85vh; overflow-y: auto;
+        }
+        .modal .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        body.dark-mode .modal .modal-content { border-color: #334155; }
+        body.dark-mode .modal .modal-header { border-bottom-color: #334155; }
+        .close-btn { cursor: pointer; font-size: 24px; color: #64748b; line-height: 1; }
+        .close-btn:hover { color: var(--danger-color); }
         .modal-box { background: var(--card-bg); color: var(--text-main); padding: 25px; border-radius: 10px; width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); border: 1px solid #cbd5e1; }
         .form-control { display: flex; flex-direction: column; margin-bottom: 12px; position: relative; }
         .form-control label { font-weight: 600; margin-bottom: 5px; color: var(--text-main); }
@@ -885,8 +907,9 @@
         </div>
 
     </div>
+</div>
 
-    <script>
+<script>
         // داتا وهياكل المصفوفات المربوطة والمحدثة بالمنظومة
         let stockProducts = [
             { id: 1, name: "قماش جوخ رجالي فاخر", qty: 120, price: 150 },
@@ -1528,8 +1551,15 @@
         function calculateFinancialReports() {
             const range = document.getElementById('report-range-select').value;
             const picker = document.getElementById('report-date-picker').value;
+            
+            // البيانات الحية (الفواتير التي لم تُصفَّ بعد)
             let filtered = [...invoiceRegistry, ...invoiceArchive];
-            if (typeof tasfeyaRegistry !== 'undefined') {
+            
+            // للفترات التاريخية (مش اليوم الحالي): نضيف فواتير التصفيات السابقة
+            // هكذا الأرقام تظهر صح للأسبوع/الشهر/السنة
+            // لكن لـ today: فقط الفواتير الحية (بعد التصفية بتصفر)
+            const isCurrentDay = !picker && range === 'today';
+            if (!isCurrentDay && typeof tasfeyaRegistry !== 'undefined') {
                 tasfeyaRegistry.forEach(t => {
                     if (t.invoices) {
                         filtered = [...filtered, ...t.invoices];
@@ -2902,11 +2932,14 @@
             const lastTasfeyaTime = tasfeyaRegistry.length > 0 ? new Date(tasfeyaRegistry[tasfeyaRegistry.length - 1].timestamp) : new Date(0);
             const newMerchantTx = merchantTransactions.filter(tx => new Date(tx.timestamp) > lastTasfeyaTime);
 
+            // الربح الصافي = ربح المنتجات - المصروفات، والحد الأدنى صفر (ما يكونش سالب)
+            const netProfit = Math.max(0, currentTasfeyaData.profitTotal - expenses);
+
             const record = {
                 id: Date.now(),
                 timestamp: new Date().toISOString(),
                 sales: currentTasfeyaData.salesTotal,
-                profit: currentTasfeyaData.profitTotal - expenses,
+                profit: netProfit,
                 calcCash: currentTasfeyaData.calcCash,
                 calcVf: currentTasfeyaData.calcVf,
                 actualCash: actualCash,
@@ -2919,15 +2952,21 @@
             };
 
             tasfeyaRegistry.push(record);
-            
+
+            // مسح الفواتير من نقطة البيع والأرشيف بعد التصفية
             invoiceRegistry = invoiceRegistry.filter(inv => !newInvoices.find(i => i.id === inv.id));
             invoiceArchive = invoiceArchive.filter(inv => !newInvoices.find(i => i.id === inv.id));
+            // مسح حركات التجار من السجل الحي بعد التصفية
             merchantTransactions = merchantTransactions.filter(tx => !newMerchantTx.find(t => t.id === tx.id));
-            
+
             saveAppState();
             closeTasfeyaModal();
             showToast(autoClose ? 'تم إغلاق الشيفت تلقائياً' : 'تم حفظ التصفية بنجاح', 'success');
 
+            // تحديث الواجهة فوراً بعد التصفية
+            if (typeof renderInvoiceTables === 'function') renderInvoiceTables();
+            if (typeof renderTxTable === 'function') renderTxTable();
+            if (typeof calculateFinancialReports === 'function') calculateFinancialReports();
             if (currentPageId === 'tasfeya-log-page' && typeof renderTasfeyaLog === 'function') {
                 renderTasfeyaLog();
             }
@@ -3123,8 +3162,12 @@
         function viewTasfeyaDetails(id) {
             const tasfeya = tasfeyaRegistry.find(t => t.id === id);
             if(!tasfeya) return;
-            
-            document.getElementById('tasfeya-view-title').innerText = `تفاصيل تصفية: ${new Date(tasfeya.timestamp).toLocaleString('ar-EG')}`;
+
+            // تنسيق التاريخ والوقت
+            const d = new Date(tasfeya.timestamp);
+            const dateStr = d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+            const timeStr = d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('tasfeya-view-title').innerText = `تفاصيل تصفية: ${dateStr} الساعة ${timeStr}`;
             
             let invHtml = '';
             const invoices = tasfeya.invoices || [];
@@ -3148,16 +3191,31 @@
             let merchHtml = '';
             const merchTxs = tasfeya.merchantTransactions || [];
             if(merchTxs.length > 0) {
-                merchHtml = '<table style="width:100%; border-collapse:collapse; margin-top: 10px;"><tr><th style="border:1px solid #cbd5e1; padding:8px;">التاجر</th><th style="border:1px solid #cbd5e1; padding:8px;">الوقت</th><th style="border:1px solid #cbd5e1; padding:8px;">النوع</th><th style="border:1px solid #cbd5e1; padding:8px;">المبلغ</th></tr>';
+                const thStyle = 'border:1px solid #cbd5e1; padding:10px; background:#f8fafc; font-weight:bold;';
+                const tdStyle = 'border:1px solid #cbd5e1; padding:10px;';
+                merchHtml = `<table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                    <tr>
+                        <th style="${thStyle}">التاجر</th>
+                        <th style="${thStyle}">التاريخ والوقت</th>
+                        <th style="${thStyle}">نوع العملية</th>
+                        <th style="${thStyle}">المبلغ</th>
+                    </tr>`;
                 merchTxs.forEach(tx => {
-                    const d = new Date(tx.timestamp);
-                    const typeStr = tx.type === 'pay' ? 'تحصيل' : 'إضافة';
-                    const color = tx.type === 'pay' ? 'var(--success-color)' : 'var(--danger-color)';
+                    const dt = new Date(tx.timestamp);
+                    const txDateStr = dt.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+                    const txTimeStr = dt.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                    // نوع العملية يُقرأ مباشرة من السجل
+                    const typeStr = tx.type || 'غير محدد';
+                    const isCollection = typeStr === 'تحصيل';
+                    const color = isCollection ? '#047857' : '#b91c1c';
+                    const badge = isCollection
+                        ? `<span style="background:#d1fae5; color:#065f46; padding:3px 10px; border-radius:20px; font-size:13px; font-weight:bold;">✓ ${typeStr}</span>`
+                        : `<span style="background:#fee2e2; color:#991b1b; padding:3px 10px; border-radius:20px; font-size:13px; font-weight:bold;">⇓ ${typeStr}</span>`;
                     merchHtml += `<tr>
-                        <td style="border:1px solid #cbd5e1; padding:8px;">${escapeHTML(tx.merchantName || 'تاجر محذوف')}</td>
-                        <td style="border:1px solid #cbd5e1; padding:8px;">${d.toLocaleTimeString('ar-EG')}</td>
-                        <td style="border:1px solid #cbd5e1; padding:8px; color:${color}; font-weight:bold;">${typeStr}</td>
-                        <td style="border:1px solid #cbd5e1; padding:8px; font-weight:bold;">${tx.amount} ج.م</td>
+                        <td style="${tdStyle}">${escapeHTML(tx.merchantName || 'تاجر محذوف')}</td>
+                        <td style="${tdStyle}">${txDateStr} ، ${txTimeStr}</td>
+                        <td style="${tdStyle}">${badge}</td>
+                        <td style="${tdStyle}; font-weight:bold; color:${color};">${tx.amount} ج.م</td>
                     </tr>`;
                 });
                 merchHtml += '</table>';
@@ -3199,21 +3257,61 @@
             // if(hasUpdate) { showToast('يوجد تحديث جديد للبرنامج!', 'info'); }
         }, 5000);
 
+        // ===== استقبال إشعارات التحديث من الـ Main Process =====
+        try {
+            const { ipcRenderer } = require('electron');
+            ipcRenderer.on('update-status', (event, data) => {
+                if (!data) return;
+                switch(data.type) {
+                    case 'downloading':
+                        showToast(`⬇️ ${data.message}`, 'info');
+                        break;
+                    case 'progress':
+                        // تحديث بار التقدم كل 10%
+                        if (data.percent % 10 === 0) {
+                            showToast(`⬇️ ${data.message}`, 'info');
+                        }
+                        break;
+                    case 'ready':
+                        showToast(`✅ تم تحميل التحديث v${data.version} - سيظهر مربع الاختيار قريباً`, 'success');
+                        break;
+                    case 'postponed':
+                        showToast(`⏳ ${data.message}`, 'info');
+                        break;
+                    case 'error':
+                        showToast(`❌ ${data.message}`, 'error');
+                        break;
+                }
+            });
+        } catch(e) {
+            // Not in Electron context (dev mode)
+        }
+
     </script>
 
-    <!-- Tasfeya View Modal -->
-    <div id="tasfeya-view-modal" class="modal">
-        <div class="modal-content" style="max-width: 800px; width: 90%;">
+    <!-- Tasfeya View Modal - fixed overlay on top of everything -->
+    <div id="tasfeya-view-modal" class="modal" onclick="if(event.target===this)closeTasfeyaViewModal()">
+        <div class="modal-content" style="max-width: 860px; width: 92%;">
             <div class="modal-header">
-                <h3 id="tasfeya-view-title" style="margin:0;">تفاصيل التصفية</h3>
+                <h3 id="tasfeya-view-title" style="margin:0; font-size:17px;">تفاصيل التصفية</h3>
                 <span class="close-btn" onclick="closeTasfeyaViewModal()">&times;</span>
             </div>
-            <div style="display:flex; gap:10px; margin-bottom:15px; border-bottom:1px solid #cbd5e1; padding-bottom:10px;">
-                <button id="tasfeya-tab-invoices" class="btn" style="flex:1; border:none; padding:10px; border-radius:5px; font-weight:bold; cursor:pointer;" onclick="switchTasfeyaTab('invoices')">الفواتير</button>
-                <button id="tasfeya-tab-merchants" class="btn" style="flex:1; border:none; padding:10px; border-radius:5px; font-weight:bold; cursor:pointer;" onclick="switchTasfeyaTab('merchants')">حركات التجار</button>
+            <!-- Tab buttons -->
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button id="tasfeya-tab-invoices"
+                    style="flex:1; padding:11px; border-radius:8px; border:none; font-size:15px; font-weight:bold; cursor:pointer; transition:all 0.2s; background:var(--primary-color); color:#fff;"
+                    onclick="switchTasfeyaTab('invoices')">
+                    🧾 الفواتير
+                </button>
+                <button id="tasfeya-tab-merchants"
+                    style="flex:1; padding:11px; border-radius:8px; border:none; font-size:15px; font-weight:bold; cursor:pointer; transition:all 0.2s; background:#e2e8f0; color:#334155;"
+                    onclick="switchTasfeyaTab('merchants')">
+                    🤝 حركات التجار
+                </button>
             </div>
-            <div id="tasfeya-view-invoices-content" style="max-height: 400px; overflow-y: auto;"></div>
-            <div id="tasfeya-view-merchants-content" style="max-height: 400px; overflow-y: auto; display:none;"></div>
+            <!-- Tab contents -->
+            <div id="tasfeya-view-invoices-content" style="max-height: 430px; overflow-y: auto;"></div>
+            <div id="tasfeya-view-merchants-content" style="max-height: 430px; overflow-y: auto; display:none;"></div>
         </div>
     </div>
 </body>

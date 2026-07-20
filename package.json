@@ -1,6 +1,6 @@
 {
   "name": "mstock",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "main.js",
   "scripts": {
@@ -42,7 +42,7 @@
         }
       ],
       "artifactName": "Mstock-${version}-${arch}.${ext}",
-      "icon": "build/icon.ico"
+      "icon": "build/icon.png"
     },
     "files": [
       "**/*",
