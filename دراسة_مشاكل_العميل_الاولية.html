@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>دراسة مشاكل العميل الأولية - Mstock POS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+
+        @page {
+            size: A4;
+            margin: 18mm;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-color: #f1f5f9;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px 15px;
+            line-height: 1.75;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 40px 50px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+
+        .print-btn-bar {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: white;
+            border: none;
+            padding: 12px 36px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn-print:hover { transform: translateY(-2px); }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: #eff6ff;
+            color: var(--primary);
+            border: 1px solid #bfdbfe;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            margin: 5px 0;
+            color: var(--primary);
+            font-size: 34px;
+            font-weight: 900;
+        }
+
+        .header h2 {
+            margin: 0 0 10px 0;
+            color: #2563eb;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin: 5px 0 0 0;
+            font-size: 15px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 21px;
+            font-weight: 800;
+            border-right: 6px solid #2563eb;
+            padding-right: 14px;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            background: #f8fafc;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .card-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 22px;
+            border-right: 5px solid #2563eb;
+        }
+
+        .card-box.alert {
+            background: #fef2f2;
+            border-right-color: var(--danger);
+        }
+
+        .card-box-title {
+            font-weight: 800;
+            font-size: 17px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-box-title.red {
+            color: var(--danger);
+        }
+
+        .detail-row {
+            margin-bottom: 8px;
+            font-size: 15px;
+            text-align: justify;
+        }
+
+        .detail-label {
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        /* TABLES: All Cells Centered Horizontally & Vertically */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 13px 14px;
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+            .print-btn-bar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-btn-bar">
+        <button class="btn-print" onclick="window.print()">🖨️ طباعة المستند أو حفظه كـ PDF</button>
+    </div>
+
+    <div class="container">
+
+        <div class="header">
+            <span class="header-badge">مشروع تخرج / تحليل المتطلبات ودراسة الجدوى الفنية</span>
+            <h1>دراسة المشكلات الواقعية للعميل</h1>
+            <h2>دوافع إنشاء المنظومة ومتطلبات التصور الأول (Problem Statement)</h2>
+            <p>مشروع Mstock POS - دراسة ميدانية مطبقة على متجر: محل فرج للأقمشة والملابس</p>
+        </div>
+
+        <div style="background: #f1f5f9; border: 1px solid #cbd5e1; border-right: 5px solid var(--primary); padding: 18px 22px; border-radius: 8px; margin-bottom: 25px; font-size: 15px; text-align: justify;">
+            <strong>سياق الدراسة الميدانية:</strong> انطلق هذا المشروع لمعالجة أزمات إدارية ومحاسبية حقيقية كان يعاني منها تاجر تجزئة وجملة في مجال الأقمشة والمنسوجات. كان المتجر يعتمد كلياً على النمط الورقي التقليدي، مما أدى لتراكم خسائر غير مرئية وتضارب يومي في حركة النقدية والمخزون. بناءً على المقابلات وجلسات استخراج المتطلبات (Requirements Elicitation)، حدد العميل 4 مشاكل وتحديات جوهرية طلب إيجاد حل برمجي جذري لها في التصور الأول.
+        </div>
+
+        <div class="section-title">1. المشكلات الأربع الأساسية التي طلب العميل حلاً لها في البداية</div>
+
+        <!-- Problem 1 -->
+        <div class="card-box">
+            <div class="card-box-title">📌 المشكلة الأولى: تضارب وعدم دقة المخزون وتتبع أمتار الأقمشة</div>
+            <div class="detail-row"><span class="detail-label">• الوضع القائم القديم:</span> كان بيع الأقمشة يتم يدوياً دون أي نظام إلكتروني ينقص الأمتار المباعة من الرصيد الكلي لطاقات وثياب القماش.</div>
+            <div class="detail-row"><span class="detail-label">• الأضرار والخسائر المترتبة:</span> تكرار بيع أقمشة يكتشف العاملون لاحقاً نفادها من المخزن مما يسبب حرجاً بالغاً وخسارة للزبائن، وتراكم خامات راكدة لشهور طويلة دون علم الإدارة، وانعدام القدرة على تقييم رأس المال المستثمر في البضاعة المعروضة.</div>
+            <div class="detail-row"><span class="detail-label">• الحل الذي طلبه العميل:</span> نظام جرد آلي يسجل خامات الأقمشة بالأمتار والأسعار، ويربط شاشة البيع بخصم فوري مباشر من رصيد القماش، مع حساب إجمالي قيمة البضاعة ورأس مال المخزن بالجنيه لحظة بلحظة.</div>
+        </div>
+
+        <!-- Problem 2 -->
+        <div class="card-box">
+            <div class="card-box-title">📌 المشكلة الثانية: فوضى حسابات الموردين وتوريد البضاعة بالدفاتر الورقية</div>
+            <div class="detail-row"><span class="detail-label">• الوضع القائم القديم:</span> تسجيل شحنات تجار الأقمشة (مثل: شركات الغزل ومصانع الحرير) في كشاكيل ورقية خارجية معرضة للتلف والضياع.</div>
+            <div class="detail-row"><span class="detail-label">• الأضرار والخسائر المترتبة:</span> نشوب نزاعات متكررة مع الموردين حول المبالغ المدفوعة وتواريخ الدفعات وقيمة المديونية المتبقية، إضافة إلى انفصال عملية استلام البضاعة عن تسجيلها في رصيد المخزن.</div>
+            <div class="detail-row"><span class="detail-label">• الحل الذي طلبه العميل:</span> شاشة مخصصة لإدارة الموردين تقوم بتسجيل فاتورة التوريد وربطها بالمخزن آلياً؛ بحيث تزيد كمية الأقمشة فوراً وتُثبت باقي قيمة الفاتورة غير المدفوعة كمديونية على المحل، مع إصدار كشف حساب تفصيلي لكل مورد.</div>
+        </div>
+
+        <!-- Problem 3 -->
+        <div class="card-box">
+            <div class="card-box-title">📌 المشكلة الثالثة: تداخل الكاش والمحافظ الإلكترونية واختلال سيولة الدرج</div>
+            <div class="detail-row"><span class="detail-label">• الوضع القائم القديم:</span> تزايد إقبال الزبائن على السداد عبر فودافون كاش والمحافظ الإلكترونية إلى جانب النقد الكاش، وقيام بعض الزبائن بتقسيم الحساب (جزء نقد وجزء محفظة).</div>
+            <div class="detail-row"><span class="detail-label">• الأضرار والخسائر المترتبة:</span> في نهاية اليوم، يكتشف الكاشير وجود نقص في الفلوس النقدية بدرج المحل مقارنة بإجمالي الفواتير، مما يثير الشكوك في حدوث سرقات أو اختلاسات، وصعوبة مطابقة رسائل الهواتف مع عمليات البيع.</div>
+            <div class="detail-row"><span class="detail-label">• الحل الذي طلبه العميل:</span> تضمين شاشة البيع بأزرار واضحة وصريحة لاختيار وسيلة الدفع (نقدي / فودافون كاش / تقسيم)، وتخصيص تقرير مالي يفصل النقد الفعلي الواجب توفره بالدرج عن المبالغ المحولة على أرقام هواتف المحل.</div>
+        </div>
+
+        <!-- Problem 4 -->
+        <div class="card-box alert">
+            <div class="card-box-title red">⚠️ المشكلة الرابعة (الشرط المعماري الحرج): عدم مسح البيانات ورفض الاشتراكات الدورية</div>
+            <div class="detail-row"><span class="detail-label">• الشرط التجاري الصارم للعميل:</span> رفض العميل التام والقاطع لأي برامج محاسبية سحابية تفرض رسوم اشتراك شهرية أو سنوية (SaaS Databases)، واشتراطه دفع تكلفة شراء البرنامج لمرة واحدة فقط (One-time Lifetime Payment).</div>
+            <div class="detail-row"><span class="detail-label">• مخاوف العميل من فقدان البيانات:</span> الخوف الشديد من ضياع حسابات المحل وسجلات الديون عند انقطاع الإنترنت أو سقوط نظام التشغيل أو تعطل السيرفرات الخارجية.</div>
+            <div class="detail-row"><span class="detail-label">• الحل الهندسي المعتمد:</span> بناء البرنامج كـ (Offline-First Desktop Application) بقاعدة بيانات محلية سريعة ومحمية تعمل محلياً 100% دون إنترنت ودون أي تكاليف سيرفرات، مع توفير مزامنة سحابية غير مدفوعة عبر ربط حساب Google Drive الشخصي للمتجر لحفظ واسترجاع البيانات بضغطة زر مجاناً.</div>
+        </div>
+
+        <div class="section-title">2. مصفوفة مقارنة المشاكل بالحلول البرمجية المنفذة في Mstock</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">المشكلة الواقعية للعميل</th>
+                    <th style="width: 35%;">الأثر المباشر على المتجر قبل البرنامج</th>
+                    <th style="width: 40%;">الحل البرمجي المطبق في التصور الأول</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1. تضارب مبيعات ومخزون الأقمشة</strong></td>
+                    <td>بيع أقمشة نفدت، ركود خامات، وانعدام معرفة رأس المال الفعلي.</td>
+                    <td>جدول جرد لحظي يخصم الأمتار مع كل فاتورة، وشريط إحصاء لقيمة المخزن.</td>
+                </tr>
+                <tr>
+                    <td><strong>2. فوضى دفاتر حسابات الموردين</strong></td>
+                    <td>نزاعات حول المديونيات، ضياع إثباتات السداد، وانفصال التوريد عن المخزن.</td>
+                    <td>شاشة توريد تزيد المخزن وتثبت مديونية التاجر آلياً مع كشف حساب تاريخي.</td>
+                </tr>
+                <tr>
+                    <td><strong>3. تداخل الكاش مع فودافون كاش</strong></td>
+                    <td>عجز ظاهري في الدرج وشكوك في السرقات وصعوبة مطابقة السيولة.</td>
+                    <td>أزرار دفع صريحة (نقدي/كاش إلكتروني/تقسيم) وفصل تقارير الدرج عن المحافظ.</td>
+                </tr>
+                <tr>
+                    <td><strong>4. رفض الاشتراكات والخوف من فقدان البيانات</strong></td>
+                    <td>رفض دفع مبالغ شهرية للسيرفرات والخوف من توقف المحل عند انقطاع النت.</td>
+                    <td>تطبيق مكتبي Offline-First بقاعدة بيانات محلية ومزامنة مجانية مع Google Drive.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-title">3. خلاصة التسليم والمناقشة الأكاديمية</div>
+        <p style="font-size: 15px; text-align: justify;">
+            تُظهر هذه الدراسة الميدانية أن منظومة <strong>Mstock POS</strong> لم تُبنَ كفكرة نظرية مجردة، بل جاءت كاستجابة هندسية مباشرة لاحتياجات حقيقية في متجر أقمشة قائم. وقد شكلت هذه المشكلات الأربع النواة الصلبة التي حُددت على أساسها معمارية النظام (Architecture)، وقواعد البيانات المحلية، وواجهات الاستخدام السريعة في التصور الأول، مما مهّد لنجاح المنظومة وإضافة المتطلبات اللاحقة (الشكك، التصفية، والتفصيل) في المراحل التالية.
+        </p>
+
+    </div>
+
+</body>
+</html>
+

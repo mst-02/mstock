@@ -32,7 +32,9 @@ autoUpdater.on('download-progress', (progressObj) => {
     notifyRenderer('update-status', {
         type: 'progress',
         message: `جاري التحميل: ${Math.floor(progressObj.percent)}%`,
-        percent: Math.floor(progressObj.percent)
+        percent: Math.floor(progressObj.percent),
+        transferred: progressObj.transferred,
+        total: progressObj.total
     });
 });
 
@@ -216,5 +218,9 @@ ipcMain.handle('check-for-updates', async () => {
     } catch (error) {
         return { error: error.message };
     }
+});
+
+ipcMain.handle('get-app-version', () => {
+    return app.getVersion();
 });
 

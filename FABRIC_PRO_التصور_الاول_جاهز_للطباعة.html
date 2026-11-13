@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>FABRIC PRO - وثيقة التصور الأول UI/UX</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        :root {
+            --navy: #172B4D;
+            --blue: #2563EB;
+            --light-bg: #F1F5F9;
+            --surface: #FFFFFF;
+            --success: #16A34A;
+            --danger: #DC2626;
+            --warning: #D97706;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border: #CBD5E1;
+        }
+
+        body {
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px 15px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 40px 50px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+
+        .print-btn-bar {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, var(--blue), var(--navy));
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+            transition: transform 0.2s;
+        }
+        .btn-print:hover { transform: translateY(-2px); }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--navy);
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: #EFF6FF;
+            color: var(--blue);
+            border: 1px solid #BFDBFE;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            margin: 5px 0;
+            color: var(--navy);
+            font-size: 34px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .header h2 {
+            margin: 0 0 10px 0;
+            color: var(--blue);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin: 5px 0 0 0;
+            font-size: 15px;
+        }
+
+        .section-title {
+            color: var(--navy);
+            font-size: 22px;
+            font-weight: 800;
+            border-right: 6px solid var(--blue);
+            padding-right: 14px;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            background: #F8FAFC;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .section-desc {
+            font-size: 15px;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .kpi-card {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border-top: 4px solid var(--blue);
+        }
+
+        .kpi-card.green { border-top-color: var(--success); }
+        .kpi-card.red { border-top-color: var(--danger); }
+        .kpi-card.amber { border-top-color: var(--warning); }
+
+        .kpi-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--navy);
+            margin-bottom: 4px;
+        }
+
+        .kpi-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            font-size: 14px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 12px 14px;
+            text-align: right;
+        }
+
+        th {
+            background-color: var(--navy);
+            color: white;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+
+        .card-box {
+            background: #F8FAFC;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-right: 5px solid var(--blue);
+        }
+
+        .card-box.alert {
+            background: #FEF2F2;
+            border-right-color: var(--danger);
+        }
+
+        .card-box-title {
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--navy);
+            margin-bottom: 8px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .chart-box {
+            background: #FFFFFF;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .chart-header {
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #E2E8F0;
+            padding-bottom: 6px;
+        }
+
+        .chart-visual-mockup {
+            height: 90px;
+            background: #F8FAFC;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--blue);
+            font-weight: bold;
+            font-size: 13px;
+            border: 1px dashed var(--border);
+        }
+
+        ul {
+            padding-right: 22px;
+            margin: 8px 0;
+        }
+
+        li {
+            margin-bottom: 6px;
+            font-size: 14.5px;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+            .print-btn-bar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-btn-bar">
+        <button class="btn-print" onclick="window.print()">🖨️ طباعة المستند أو حفظه كـ PDF</button>
+    </div>
+
+    <div class="container">
+
+        <div class="header">
+            <span class="header-badge">مشروع تخرج / وثيقة التصميم الهندسي والتصور الأول</span>
+            <h1>FABRIC PRO</h1>
+            <h2>Fabric Store Management System</h2>
+            <p>التصور المبدئي المتكامل لهندسة واجهات وتجربة مستخدم (UI/UX) نظام إدارة متاجر الأقمشة ومستلزمات الخامات</p>
+        </div>
+
+        <!-- 1. Visual Identity -->
+        <div class="section-title">1. الهوية البصرية للتطبيق (Visual Identity)</div>
+        <p class="section-desc">تم اختيار نمط <strong>Modern Minimal Dashboard</strong> ليعكس طابعاً عملياً شديد الوضوح والانسيابية يلائم بيئة محلات الأقمشة السريعة والمليئة بالحسابات الدقيقة:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">العنصر</th>
+                    <th style="width: 35%;">القيمة والمواصفة</th>
+                    <th style="width: 40%;">الدور الوظيفي في الواجهة</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>اللون الأساسي (Primary)</strong></td>
+                    <td><span style="color: #172B4D; font-weight: bold;">Navy #172B4D</span></td>
+                    <td>القائمة الجانبية والعناوين الكبرى لتعزيز الثقة والاستقرار المالي.</td>
+                </tr>
+                <tr>
+                    <td><strong>لون التفاعل (Accent)</strong></td>
+                    <td><span style="color: #2563EB; font-weight: bold;">Blue #2563EB</span></td>
+                    <td>الأزرار النشطة ومؤشرات الإحصائيات والتحديدات الحية.</td>
+                </tr>
+                <tr>
+                    <td><strong>الخلفيات (Backgrounds)</strong></td>
+                    <td><span style="color: #475569; font-weight: bold;">Light Surface #F1F5F9</span></td>
+                    <td>خلفية هادئة ومريحة تعزل كروت البيانات البيضاء وتمنع التشتت.</td>
+                </tr>
+                <tr>
+                    <td><strong>ألوان الحالات (Indicators)</strong></td>
+                    <td>أخضر #16A34A | أحمر #DC2626 | برتقالي #D97706</td>
+                    <td>الأرباح والتحصيل (أخضر)، العجز ونفاذ الصنف (أحمر)، التنبيهات (برتقالي).</td>
+                </tr>
+                <tr>
+                    <td><strong>الخط الطباعي (Typography)</strong></td>
+                    <td>Cairo / IBM Plex Sans Arabic</td>
+                    <td>وضوح فائق للأرقام والأسعار العربية بدقة تمنع اللبس أثناء البيع.</td>
+                </tr>
+                <tr>
+                    <td><strong>الاتجاه والمظهر</strong></td>
+                    <td>عربي بالكامل (RTL) + دعم الوضع الليلي والنهاري</td>
+                    <td>تجربة أصيلة للمستخدم المصري والعربي مع راحة للعين أثناء النوبات الليلية.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 2. Dashboard -->
+        <div class="section-title">2. شكل الواجهة الرئيسية ولوحة المؤشرات (Dashboard)</div>
+        <p class="section-desc">الواجهة الرئيسية هي الشاشة الأهم؛ حيث تمنح صاحب المتجر إحاطة بصرية كاملة بوضع تجارته فور الفتح:</p>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">قيمة المخزون</div>
+                <div class="kpi-value">850,000 ج.م</div>
+                <div class="kpi-sub">رأس المال المخزني</div>
+            </div>
+            <div class="kpi-card green">
+                <div class="kpi-title">مبيعات اليوم</div>
+                <div class="kpi-value" style="color: var(--success);">24,500 ج.م</div>
+                <div class="kpi-sub">إجمالي الفواتير</div>
+            </div>
+            <div class="kpi-card red">
+                <div class="kpi-title">مديونية الموردين</div>
+                <div class="kpi-value" style="color: var(--danger);">125,000 ج.م</div>
+                <div class="kpi-sub">المبالغ المستحقة</div>
+            </div>
+            <div class="kpi-card amber">
+                <div class="kpi-title">السيولة النقدية</div>
+                <div class="kpi-value" style="color: var(--warning);">48,000 ج.م</div>
+                <div class="kpi-sub">رصيد الدرج الفعلي</div>
+            </div>
+        </div>
+
+        <!-- 4 Visual Analytics Charts -->
+        <h4 style="margin: 20px 0 10px 0; color: var(--navy);">الرسوم البيانية والتحليلات الاستراتيجية الأربعة:</h4>
+        <div class="charts-grid">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>رسم المبيعات (Sales Trend)</span>
+                    <span style="color: var(--blue);">Line Chart</span>
+                </div>
+                <div class="chart-visual-mockup">📈 مقارنة المبيعات اليومية والأسبوعية والشهرية</div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>توزيع المخزون (Inventory Allocation)</span>
+                    <span style="color: var(--blue);">Donut Chart</span>
+                </div>
+                <div class="chart-visual-mockup">🍩 توزيع رأس المال على أنواع الأقمشة والخامات</div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>طرق الدفع (Payment Methods)</span>
+                    <span style="color: var(--blue);">Pie Chart</span>
+                </div>
+                <div class="chart-visual-mockup">🥧 نسبة مبيعات الكاش مقابل فودافون كاش</div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>المديونيات والسداد (Debts vs Payments)</span>
+                    <span style="color: var(--blue);">Bar Chart</span>
+                </div>
+                <div class="chart-visual-mockup">📊 مقارنة مستحقات الموردين بالمدفوعات المسددة</div>
+            </div>
+        </div>
+
+        <!-- 3. Inventory -->
+        <div class="section-title">3. شاشة إدارة المخزون (Fabric Inventory)</div>
+        <p class="section-desc">تم تصميم جدول المخزون ليراعي طبيعة تجارة الأقمشة بدقة، مع حقول متخصصة:</p>
+        <ul>
+            <li><strong>بيانات الصنف الدقيقة:</strong> اسم الصنف، كود الصنف (SKU/Barcode)، نوع القماش (صوف، كتان، جوخ، حرير)، اللون، الكمية المتاحة، ووحدة القياس (متر، طاقة، قطعة، كيلو).</li>
+            <li><strong>التسعير المزدوج:</strong> سعر الشراء التكليفي، سعر البيع للمتر، والاحتساب الآلي لقيمة المخزون الإجمالية لكل صنف (الكمية × السعر).</li>
+            <li><strong>البحث والفلترة الفورية:</strong> بحث لحظي Live-Search بمجرد الكتابة، وفلاتر منسدلة حسب نوع القماش واللون.</li>
+            <li><strong>تنبيه انخفاض المخزون (Low-Stock Alert):</strong> تنبيه لوني فوري عند اقتراب القماش من النفاد (أقل من الحد الحرج).</li>
+            <li><strong>كشف حركة الصنف:</strong> تتبع تاريخي لكل صنف (حركات الدخول من التوريد، وحركات الخروج من فواتير البيع).</li>
+        </ul>
+
+        <!-- 4. Sales & POS -->
+        <div class="section-title">4. شاشة المبيعات والفواتير (Sales & Streamlined POS)</div>
+        <p class="section-desc">صُممت لتقليل مدة إصدار الفاتورة إلى ثوانٍ معدودة عبر تدفق بديهي:</p>
+        <div class="card-box">
+            <div class="card-box-title">⚡ خطوات تدفق الفاتورة (Sales Flow):</div>
+            <p>1. اختيار الصنف عبر البحث السريع ← 2. تحديد الكمية بالأمتار ← 3. تحديد سعر البيع ← 4. حساب الإجمالي فورياً ← 5. اختيار طريقة السداد ← 6. حفظ وطباعة الفاتورة أو تصديرها PDF.</p>
+            <p><strong>خيارات السداد المعتمدة:</strong> (1) نقد كاش | (2) فودافون كاش مع تحديد رقم المحفظة | (3) دفع مختلط مقسم (Split Payment) يجمع بين الكاش والمحفظة.</p>
+        </div>
+
+        <!-- 5. Suppliers -->
+        <div class="section-title">5. شاشة الموردين والمشتريات (Suppliers & Purchasing)</div>
+        <p class="section-desc">ربط لوجستي ومحاسبي مباشر بين استلام بضائع تجار الجملة وحسابات المديونية:</p>
+        <ul>
+            <li>قائمة الموردين المعتمدين مع أرقام الهواتف وإجمالي المشتريات التاريخية.</li>
+            <li><strong>التوريد التلقائي المزدوج:</strong> عند تسجيل فاتورة توريد جديدة، تزيد كميات القماش في المخزن وتُضاف القيمة غير المدفوعة لمديونية التاجر تلقائياً.</li>
+            <li>تسجيل دفعات السداد الجزئي وإصدار كشف حساب تفصيلي لتفادي أي نزاعات حول المتبقي.</li>
+        </ul>
+
+        <!-- 6. Reports -->
+        <div class="section-title">6. شاشة التقارير والتحليلات (Reports & Analytics)</div>
+        <p class="section-desc">تحويل البيانات إلى تقارير تفاعلية منظمة تدعم اتخاذ القرار:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>التقرير</th>
+                    <th>طريقة العرض البصري</th>
+                    <th>الفائدة والقرار التجاري</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>حركة المبيعات</strong></td>
+                    <td>Line Chart</td>
+                    <td>متابعة نمو المبيعات ورصد مواسم الطلب والرواج.</td>
+                </tr>
+                <tr>
+                    <td><strong>توزيع المخزون</strong></td>
+                    <td>Donut Chart</td>
+                    <td>معرفة أين تتركز سيولة المحل وأي الأصناف تشغل المساحة الكبرى.</td>
+                </tr>
+                <tr>
+                    <td><strong>طرق الدفع</strong></td>
+                    <td>Pie Chart</td>
+                    <td>تحديد نسبة النقد الفعلي في الدرج مقارنة بالمحافظ الإلكترونية.</td>
+                </tr>
+                <tr>
+                    <td><strong>أرباح المبيعات</strong></td>
+                    <td>Bar Chart</td>
+                    <td>عرض صافي الربح الحقيقي لكل فترة زمنية.</td>
+                </tr>
+                <tr>
+                    <td><strong>مديونية الموردين</strong></td>
+                    <td>جدول مالي + رسم بياني</td>
+                    <td>جدولة التزامات السداد لتفادي توقف توريد الخامات.</td>
+                </tr>
+                <tr>
+                    <td><strong>حركة الأصناف</strong></td>
+                    <td>جدول زمني (Timeline)</td>
+                    <td>فرز الأصناف الأكثر مبيعاً والأصناف الراكدة لعمل خصومات عليها.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 7. Backup -->
+        <div class="section-title">7. شاشة النسخ الاحتياطي وحماية البيانات (The Zero-Subscription Engine)</div>
+        <div class="card-box alert">
+            <div class="card-box-title">🔒 تحقيق الشرط الحرج للعميل (عدم وجود اشتراكات دورية + حفظ دائم للبيانات):</div>
+            <p>• <strong>معمارية محلية كاملة (Offline-First):</strong> البرنامج يعمل محلياً بسرعة البرق بدون أي اشتراكات سحابية شهرية (Zero Recurring Fees).</p>
+            <p>• <strong>إنشاء واستعادة النسخ بنقرة واحدة:</strong> أخذ نسخة احتياطية من قاعدة بيانات SQLite في أي وقت، واستعادتها فورياً عند تغيير الويندوز أو صيانة الجهاز.</p>
+            <p>• <strong>نسخ سحابي مجاني عبر Google Drive:</strong> ميزة مزامنة تلقائية دورية ترفع النسخة على درايف المتجر الشخصي بدون تكلفة سيرفرات خارجية.</p>
+            <p>• <strong>التحقق من سلامة البيانات:</strong> التأكد من تكامل ملفات قاعدة البيانات والمعاملات الآمنة (ACID Transactions).</p>
+        </div>
+
+        <!-- 8. UX 3 Levels -->
+        <div class="section-title">8. تصور تجربة المستخدم (The 3-Level UX Model)</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 30%;">المستوى</th>
+                    <th style="width: 70%;">الوصف والوظائف المتاحة للمستخدم</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Level 1: العمليات اليومية</strong></td>
+                    <td>البيع، التوريد، إضافة صنف، تحصيل، سداد (أزرار كبيرة، تنفيذ في ثوانٍ معدودة).</td>
+                </tr>
+                <tr>
+                    <td><strong>Level 2: الإدارة والمتابعة</strong></td>
+                    <td>جرد المخزون، مراجعة حسابات الموردين، أرشيف الفواتير، وفحص تفاصيل الحركات.</td>
+                </tr>
+                <tr>
+                    <td><strong>Level 3: التحليل والقرار</strong></td>
+                    <td>لوحة المؤشرات الرئيسية، مراقبة السيولة والأرباح الصافية، والتقارير الاستراتيجية.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 9. Final Component Hierarchy -->
+        <div class="section-title">9. الشكل النهائي المعتمد للتنفيذ</div>
+        <p class="section-desc">اعتماد هيكل من <strong>8 شاشات رئيسية نظيفة وواسعة</strong> مع نوافذ منبثقة تفاعلية (Focused Modals) للإدخال والتعديل بدلاً من التكديس في شاشة واحدة، مما يوحد لغة التصميم ويجعل استخدام البرنامج سهلاً وبديهياً من اليوم الأول.</p>
+
+    </div>
+
+</body>
+</html>
+

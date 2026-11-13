@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>توثيق التصور الأول - MStock POS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+        
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+            line-height: 1.7;
+            color: #1e293b;
+            background-color: #f8fafc;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+
+        .header-title {
+            text-align: center;
+            border-bottom: 3px double #1e3a8a;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header-title h3 {
+            margin: 0;
+            color: #64748b;
+            font-size: 18px;
+        }
+
+        .header-title h1 {
+            margin: 8px 0;
+            color: #1e3a8a;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .header-title h2 {
+            margin: 0;
+            color: #2563eb;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .badge-bar {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .badge {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        h2.sec-heading {
+            color: #1e3a8a;
+            font-size: 20px;
+            border-right: 5px solid #2563eb;
+            padding-right: 12px;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        h3.sub-heading {
+            color: #0f172a;
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        p {
+            margin: 8px 0;
+            font-size: 15px;
+            text-align: justify;
+        }
+
+        ul {
+            margin: 10px 0;
+            padding-right: 25px;
+        }
+
+        li {
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            border-right: 4px solid #3b82f6;
+        }
+
+        .card-danger {
+            border-right-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .card-success {
+            border-right-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .card-warning {
+            border-right-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .card-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #0f172a;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 12px 14px;
+            text-align: right;
+        }
+
+        th {
+            background-color: #1e3a8a;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        .diagram-box {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+            direction: ltr;
+        }
+
+        .print-btn-bar {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-print {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+            .print-btn-bar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-btn-bar">
+        <button class="btn-print" onclick="window.print()">🖨️ طباعة هذا المستند أو حفظه كـ PDF</button>
+    </div>
+
+    <div class="container">
+
+        <div class="header-title">
+            <h3>مشروع تخرج / تطوير منظومة برمجية متكاملة</h3>
+            <h1>MStock POS System</h1>
+            <h2>المرحلة الأولى: دراسة مشاكل العميل الواقعية والتصور المبدئي الأولي</h2>
+            <div class="badge-bar">
+                <span class="badge">هندسة البرمجيات</span>
+                <span class="badge">تحليل وتصميم UI/UX</span>
+                <span class="badge">Offline-First Architecture</span>
+            </div>
+        </div>
+
+        <h2 class="sec-heading">1. دلالة اسم المشروع (Why MStock؟)</h2>
+        <p>تم اختيار اسم المنظومة <strong>MStock</strong> ليعبر عن فلسفة وهدف التطبيق بشكل هندسي مباشر:</p>
+        <ul>
+            <li><span class="highlight">حرف (M) - Management & Money:</span> يعبر عن إدارة العمليات والسيولة المالية، وضبط حركة الدرج وفصل الأموال النقدية عن الحركات الإلكترونية وحسابات الموردين دون هدر.</li>
+            <li><span class="highlight">كلمة (Stock) - المخزون:</span> تعبر عن عصب نشاط المتجر؛ حيث انطلق المشروع أساساً لعلاج عجز وتضارب بضاعة المخزن وضبط الأمتار والخامات المباعة لحظة بلحظة.</li>
+        </ul>
+
+        <h2 class="sec-heading">2. خارطة طريق المشروع وتوزيع المشاكل عبر ثلاث مراحل</h2>
+        <p>بُنيت المنظومة وفق منهجية تفاعلية حقيقية مع العميل (User-Feedback Driven Development) تم تقسيمها إلى 3 تصورات تدريجية:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">المرحلة / التصور</th>
+                    <th style="width: 45%;">المشاكل المستهدفة للدراسة</th>
+                    <th style="width: 30%;">مخرجات الـ UI والوحدات المنجزة</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>التصور الأول (النواة الأساسية)</strong></td>
+                    <td>
+                        1. تضارب مبيعات المخزن وغياب الربط اللحظي.<br>
+                        2. فوضى توريد بضاعة الموردين بالدفاتر.<br>
+                        3. تداخل الكاش والمحافظ الإلكترونية بالدرج.<br>
+                        4. <strong>شرط حفظ البيانات محلياً بدون اشتراكات دورية.</strong>
+                    </td>
+                    <td>
+                        • شاشة نقطة البيع (POS).<br>
+                        • شاشة إدارة المخزن والجرد.<br>
+                        • شاشة الموردين وحسابات البضاعة.<br>
+                        • قاعدة بيانات محلية Offline-First.
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>التصور الثاني (الإضافة الثانية)</strong></td>
+                    <td>
+                        1. تفاقم مديونيات الزبائن الآجلة (الشكك).<br>
+                        2. صداع إغلاق اليوم وعجز الدرج والمصروفات النثرية.
+                    </td>
+                    <td>
+                        • منظومة إدارة الشكك والعملاء.<br>
+                        • نافذة تصفية اليوم الذكية (حساب العجز والمصروفات).
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>التصور الثالث (الإضافة النهائية)</strong></td>
+                    <td>
+                        1. ضياع مقاسات الزبائن وعرابين قسم التفصيل والخياطة الرجالية بالمتجر.
+                    </td>
+                    <td>
+                        • موديول التفصيل المتخصص (8 مقاسات قياسية + مالي العربون والمتبقي + طباعة كارت التفصيل).
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 class="sec-heading">3. تفصيل مشاكل العميل في التصور الأول (The 4 Core Problems)</h2>
+
+        <div class="card">
+            <div class="card-title">📌 المشكلة الأولى: تضارب وعدم دقة المخزون والبيع اللحظي</div>
+            <p><strong>المشكلة الواقعية:</strong> كان المحل يبيع الأقمشة والخامات دون تسجيل فوري يخصم الكمية من المخزون، مما أدى لتكرار بيع أصناف نفدت بالفعل، وتراكم أصناف راكدة، مع عجز صاحب المحل عن معرفة رأس المال الفعلي المخزن في أي وقت.</p>
+            <p><strong>الحل الهندسي بالتصور الأول:</strong> بناء جدول مخزن ديناميكي يربط كل فاتورة بيع بخصم فوري مباشر من كميات الصنف، مع شريط إحصائي سفلي يحسب إجمالي عدد الأصناف وإجمالي قيمة البضاعة المعروضة بالجنيه آلياً.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📌 المشكلة الثانية: فوضى حسابات الموردين وتوريد البضاعة بالدفاتر</div>
+            <p><strong>المشكلة الواقعية:</strong> تسجيل بضاعة تجار الجملة في دفاتر ورقية، مما تسبب في خلافات دائمة حول المبالغ المسددة، المديونية المتبقية، وتواريخ الدفعات، إضافة لغياب الربط بين وصول البضاعة وزيادة رصيدها في المخزن.</p>
+            <p><strong>الحل الهندسي بالتصور الأول:</strong> إنشاء منظومة إدارة الموردين؛ حيث تقوم شاشة توريد البضاعة بإضافة الكمية للمخزن وتسجيل المديونية تلقائياً على المحل بعد خصم المدفوع، مع جدول أرشيفي لسجل سداد الدفعات.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📌 المشكلة الثالثة: تداخل الكاش والمحافظ الإلكترونية واختلال سيولة الدرج</div>
+            <p><strong>المشكلة الواقعية:</strong> استخدام الزبائن لوسائل دفع متنوعة (نقد كاش / فودافون كاش)، مما خلق فجوة يومية بين الفلوس الموجودة فعلياً في درج النقدية وبين إجمالي الفواتير المحسوبة.</p>
+            <p><strong>الحل الهندسي بالتصور الأول:</strong> تزويد نافذة البيع بأزرار اختيار صريحة لطريقة الدفع (نقدي / فودافون كاش)، مع فصل تقارير المبيعات النقدية عن رصيد المحافظ الإلكترونية تجنباً لأي التباس.</p>
+        </div>
+
+        <div class="card card-danger">
+            <div class="card-title">⚠️ المشكلة الرابعة (الشرط المعماري الحرج): حفظ البيانات محلياً بدون أي اشتراكات دورية</div>
+            <p><strong>التحدي التجاري للعميل:</strong> رفض العميل القاطع للأنظمة السحابية التي تفرض اشتراكات شهرية أو سنوية (SaaS Database Fees)، مع اشتراطه دفع ثمن المنظومة مرة واحدة فقط (One-time payment)، مع حتمية عدم مسح أو فقدان أي بيانات سابقة نهائياً حتى في حال انقطاع الإنترنت أو غيابه التام.</p>
+            <p><strong>الحل الهندسي والقرار المعماري:</strong> بناء المنظومة كتطبيق مكتبي محلي فائق السرعة والأمان مبني على إطار عمل Electron مع قاعدة بيانات محلية مدمجة (Offline-First Local DB)، مما يضمن استمرارية العمل بدون إنترنت ودون أي تكاليف تشغيلية دورية على العميل.</p>
+        </div>
+
+        <h2 class="sec-heading">4. هيكل التصور الأول لعناصر وواجهات النظام (Phase 1 UI/UX Architecture)</h2>
+        <p>تضمن التصور الأول ثلاث شاشات رئيسية صُممت بأزرار واضحة وألوان دلالية عالية التباين تناسب ضغط العمل اليومي:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 20%;">الشاشة</th>
+                    <th style="width: 35%;">أزرار وعناصر التحكم (UI Controls)</th>
+                    <th style="width: 45%;">الوظيفة وتجربة المستخدم (UX Logic)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>نقطة البيع (POS)</strong></td>
+                    <td>
+                        • زر <code>[إنشاء طلب جديد]</code> كبير وبارز.<br>
+                        • أزرار وسيلة السداد: <code>[نقدي]</code> / <code>[فودافون كاش]</code>.<br>
+                        • زر <code>[إضافة للجدول]</code> و <code>[حفظ الفاتورة]</code>.<br>
+                        • تبويبات علوية: (سجل الفواتير - الأرشيف - التقارير).
+                    </td>
+                    <td>
+                        فتح نافذة طلب منبثقة، اختيار المنتج وتعديل السعر والكمية وحساب الإجمالي فورياً، ثم حفظ الفاتورة وخصم الكمية من المخزن مع عرض الفواتير بالسجل.
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>إدارة المخزن (Stock)</strong></td>
+                    <td>
+                        • شريط بحث سريع عن المنتجات.<br>
+                        • زر <code>[إضافة منتج جديد]</code>.<br>
+                        • زر <code>[طباعة الكشوفات]</code> و <code>[حذف المحدد]</code>.<br>
+                        • مربعات اختيار (Checkboxes) لكل صنف.
+                    </td>
+                    <td>
+                        جدول كامل يعرض الأصناف برقم تسلسلي، الكميات، أسعار البيع، والإجمالي. شريط سفلي يحسب عدد الأصناف وإجمالي قيمة رأس المال بالمخزن.
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>إدارة الموردين (Suppliers)</strong></td>
+                    <td>
+                        • زر <code>[إضافة تاجر جديد]</code>.<br>
+                        • زر <code>[إضافة بضاعة جديدة]</code>.<br>
+                        • زر <code>[تحصيل وسداد مديونية]</code>.<br>
+                        • جدول سجل حركات وسدادات التجار.
+                    </td>
+                    <td>
+                        توريد بضاعة جديدة للمخزن آلياً، واحتساب المديونية المتبقية للتاجر فورياً، وتسجيل دفعات السداد وإصدار كشف حركة تاريخي للمورد.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2 class="sec-heading">5. الخلاصة الأكاديمية للتسليم</h2>
+        <p>يبرهن التصور الأول لمنظومة <strong>MStock POS</strong> على تلبية المتطلبات التشغيلية الأكثر إلحاحاً للمحل التجاري، من خلال حل هندسي متوازن جمع بين <strong>(التحكم المخزني + إدارة الموردين + انضباط النقدية + الأمان التام دون اشتراكات)</strong>، وهو ما مهّد الطريق للتوسعات اللاحقة (الشكك والتصفية والتفصيل) بعد قياس أثر النظام في بيئة العمل الحقيقية.</p>
+
+    </div>
+
+</body>
+</html>
+

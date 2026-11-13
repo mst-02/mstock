@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Mstock POS - وثيقة التصور الأول المعتمد (UI/UX Specification)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+
+        :root {
+            --primary: #1e3a8a;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-color: #f1f5f9;
+            --surface: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px 15px;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: var(--surface);
+            padding: 40px 50px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+
+        .print-btn-bar {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: white;
+            border: none;
+            padding: 12px 36px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+            transition: transform 0.2s;
+        }
+        .btn-print:hover { transform: translateY(-2px); }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: #eff6ff;
+            color: var(--primary);
+            border: 1px solid #bfdbfe;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            margin: 5px 0;
+            color: var(--primary);
+            font-size: 36px;
+            font-weight: 900;
+        }
+
+        .header h2 {
+            margin: 0 0 10px 0;
+            color: #2563eb;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin: 5px 0 0 0;
+            font-size: 15px;
+        }
+
+        .section-title {
+            color: var(--primary);
+            font-size: 21px;
+            font-weight: 800;
+            border-right: 6px solid #2563eb;
+            padding-right: 14px;
+            margin-top: 38px;
+            margin-bottom: 15px;
+            background: #f8fafc;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .section-desc {
+            font-size: 15px;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .kpi-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border-top: 4px solid var(--primary);
+        }
+
+        .kpi-card.green { border-top-color: var(--accent); }
+        .kpi-card.red { border-top-color: var(--danger); }
+        .kpi-card.amber { border-top-color: var(--warning); }
+
+        .kpi-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .kpi-value {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .kpi-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* TABLES: All Cells Centered Horizontally & Vertically */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 12px 14px;
+            text-align: center !important;
+            vertical-align: middle !important;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 700;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .card-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-right: 5px solid #2563eb;
+        }
+
+        .card-box.alert {
+            background: #fef2f2;
+            border-right-color: var(--danger);
+        }
+
+        .card-box-title {
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .chart-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .chart-header {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 6px;
+        }
+
+        .chart-visual-mockup {
+            height: 85px;
+            background: #f8fafc;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-weight: bold;
+            font-size: 13px;
+            border: 1px dashed var(--border);
+        }
+
+        /* Numbered and Bullet List Styling */
+        .styled-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .styled-list li {
+            position: relative;
+            padding-right: 30px;
+            margin-bottom: 12px;
+            font-size: 15px;
+            text-align: justify;
+        }
+
+        .styled-list li::before {
+            content: "•";
+            position: absolute;
+            right: 8px;
+            top: -2px;
+            color: #2563eb;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .numbered-list {
+            list-style: none;
+            counter-reset: step-counter;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .numbered-list li {
+            position: relative;
+            padding-right: 36px;
+            margin-bottom: 14px;
+            font-size: 15px;
+            text-align: justify;
+        }
+
+        .numbered-list li::before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            right: 0;
+            top: 2px;
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #bfdbfe;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .list-title {
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        code {
+            background: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+            .print-btn-bar { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="print-btn-bar">
+        <button class="btn-print" onclick="window.print()">🖨️ طباعة المستند أو حفظه كـ PDF</button>
+    </div>
+
+    <div class="container">
+
+        <div class="header">
+            <span class="header-badge">مشروع تخرج / وثيقة التصميم الهندسي والتصور الأول (Phase 1)</span>
+            <h1>Mstock POS</h1>
+            <h2>نظام إدارة المبيعات والمخازن (محل فرج للأقمشة والملابس)</h2>
+            <p>التصور المبدئي المتكامل لهندسة واجهات وتجربة مستخدم (UI/UX) نظام إدارة متاجر الأقمشة والمنسوجات</p>
+        </div>
+
+        <!-- 1. Visual Identity -->
+        <div class="section-title">1. الهوية البصرية للتطبيق (Visual Identity من واقع شفرة Mstock)</div>
+        <p class="section-desc">تم تصميم الواجهات وفق فلسفة <strong>Modern Minimal Dashboard</strong> باستخدام متغيرات التصميم المعتمدة في كود البرنامج لتوفير بيئة عالية التباين والانضباط المالي:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">العنصر</th>
+                    <th style="width: 35%;">المواصفة الكودية في Mstock</th>
+                    <th style="width: 40%;">الدور الوظيفي في تجربة الاستخدام</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>اسم البرنامج الرسمي</strong></td>
+                    <td><code>Mstock POS</code></td>
+                    <td>اختصار Management & Money of Stock لإدارة المخزن والسيولة.</td>
+                </tr>
+                <tr>
+                    <td><strong>اللون الأساسي (Primary)</strong></td>
+                    <td><span style="color: #1e3a8a; font-weight: bold;">Deep Blue #1e3a8a</span></td>
+                    <td>الشريط الجانبي (Sidebar) وترويسات الجداول لإضفاء الاستقرار والجدية الإدارية.</td>
+                </tr>
+                <tr>
+                    <td><strong>لون التأكيد والأرباح (Accent)</strong></td>
+                    <td><span style="color: #10b981; font-weight: bold;">Emerald Green #10b981</span></td>
+                    <td>أزرار حفظ الفاتورة، السداد النقدي، والتحصيل وتأكيد العمليات.</td>
+                </tr>
+                <tr>
+                    <td><strong>ألوان التنبيه والعمليات</strong></td>
+                    <td>برتقالي #f59e0b | أحمر #ef4444</td>
+                    <td>الدفع المقسم والتفصيل (برتقالي)، حذف البنود والإلغاء (أحمر).</td>
+                </tr>
+                <tr>
+                    <td><strong>الخلفيات (Backgrounds)</strong></td>
+                    <td><span style="color: #475569; font-weight: bold;">Light Surface #f1f5f9</span></td>
+                    <td>خلفية رمادية ناعمة تبرز كروت البيانات البيضاء وتمنع تشتيت الانتباه.</td>
+                </tr>
+                <tr>
+                    <td><strong>الخط الطباعي (Typography)</strong></td>
+                    <td>خط Cairo (من Google Fonts: 400, 600, 700)</td>
+                    <td>قراءة بالغة الوضوح لأمتار الأقمشة وأرقام الأسعار لتفادي أي التباس بالبيع.</td>
+                </tr>
+                <tr>
+                    <td><strong>دعم المظهر</strong></td>
+                    <td>عربي بالكامل (RTL) + الوضع النهاري والليلي (Dark Mode)</td>
+                    <td>مفتاح تبديل في الإعدادات لتغيير الخلفيات إلى <code>#0f172a</code> لراحة العين ليلاً.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 2. Dashboard -->
+        <div class="section-title">2. شكل الواجهة الرئيسية ولوحة المؤشرات في Mstock (Dashboard)</div>
+        <p class="section-desc">صُممت الشاشة الرئيسية لتزود صاحب المتجر بكشف فوري لحظي لحركة الأقمشة والسيولة فور فتح البرنامج:</p>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-title">قيمة المخزن المعروض</div>
+                <div class="kpi-value">مجموع البضاعة</div>
+                <div class="kpi-sub">رأس المال المخزني الحالي</div>
+            </div>
+            <div class="kpi-card green">
+                <div class="kpi-title">مبيعات الوردية</div>
+                <div class="kpi-value" style="color: var(--accent);">إجمالي الفواتير</div>
+                <div class="kpi-sub">مبيعات الوردية الحالية</div>
+            </div>
+            <div class="kpi-card red">
+                <div class="kpi-title">مديونية الموردين</div>
+                <div class="kpi-value" style="color: var(--danger);">المبالغ المستحقة</div>
+                <div class="kpi-sub">المتبقي لشركات الأقمشة</div>
+            </div>
+            <div class="kpi-card amber">
+                <div class="kpi-title">السيولة النقدية (الدرج)</div>
+                <div class="kpi-value" style="color: var(--warning);">رصيد الكاش</div>
+                <div class="kpi-sub">النقد الفعلي بدرج الكاشير</div>
+            </div>
+        </div>
+
+        <h4 style="margin: 20px 0 10px 0; color: var(--primary);">القائمة الجانبية (Sidebar) للتصور الأول:</h4>
+        <ol class="numbered-list">
+            <li><span class="list-title">نقطة البيع (Cashier / POS):</span> إصدار الفواتير، فحص سجل الشيفت، الأرشيف، وحسابات الأرباح الصافية.</li>
+            <li><span class="list-title">إدارة المخزن (Stock Inventory):</span> جرد خامات الأقمشة، تقييم رأس المال المعروض، والبحث والطباعة.</li>
+            <li><span class="list-title">إدارة الموردين والتجار (Merchants):</span> توريد الأقمشة للمخزن آلياً، سداد الدفعات، وتتبع مديونيات الشركات.</li>
+            <li><span class="list-title">التقارير والتحليلات المالية:</span> تحليل مبيعات الفترات، صافي الأرباح، وفصل الكاش عن فودافون كاش.</li>
+            <li><span class="list-title">الإعدادات والأمان والنسخ الاحتياطي:</span> بيانات المحل، أرقام الكاش، قفل PIN، والمزامنة السحابية مع Google Drive.</li>
+        </ol>
+
+        <!-- 4 Visual Analytics Charts -->
+        <h4 style="margin: 20px 0 10px 0; color: var(--primary);">الرسوم البيانية والتحليلات الأربعة في Mstock:</h4>
+        <div class="charts-grid">
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>رسم المبيعات الزمنية (Sales Trend)</span>
+                    <span style="color: #2563eb;">Line Chart</span>
+                </div>
+                <div class="chart-visual-mockup">📈 مقارنة مبيعات اليوم، الأسبوع، الشهر، والسنة</div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>توزيع خامات المخزون (Fabric Allocation)</span>
+                    <span style="color: #2563eb;">Donut Chart</span>
+                </div>
+                <div class="chart-visual-mockup">🍩 نسبة رأس المال (جوخ فاخر، كشمير، كتان إيطالي، حرير)</div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>وسائل الدفع (Cash vs VF Cash)</span>
+                    <span style="color: #2563eb;">Pie Chart</span>
+                </div>
+                <div class="chart-visual-mockup">🥧 نسبة مبيعات الكاش بالدرج مقابل فودافون كاش</div>
+            </div>
+            <div class="chart-box">
+                <div class="chart-header">
+                    <span>مديونيات الموردين والمدفوعات</span>
+                    <span style="color: #2563eb;">Bar Chart</span>
+                </div>
+                <div class="chart-visual-mockup">📊 مقارنة إجمالي التوريدات بالمسدد والمتبقي للتجار</div>
+            </div>
+        </div>
+
+        <!-- 3. Inventory -->
+        <div class="section-title">3. شاشة إدارة وجرد المخزن في Mstock (Stock Inventory)</div>
+        <p class="section-desc">تم ضبط جدول المخزن ليطابق طبيعة تجارة أقمشة الملابس بالقطعة والمتر، مع ميزات دقيقة:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">عنصر الواجهة والتحكم</th>
+                    <th style="width: 35%;">المواصفة البرمجية في Mstock</th>
+                    <th style="width: 40%;">الأثر الميداني في محل الأقمشة</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>حقول بيانات الصنف</strong></td>
+                    <td>الرقم المتسلسل، اسم القماش، الكمية المتاحة بالأمتار، السعر، والإجمالي.</td>
+                    <td>أمثلة فعلية: (جوخ فاخر: 120 متر بسعر 150 ج.م، كشمير تركي: 50 متر بسعر 400 ج.م).</td>
+                </tr>
+                <tr>
+                    <td><strong>الترقيم المتسلسل التلقائي</strong></td>
+                    <td>دالة <code>renderStockTable</code> ترتب الأرقام (1, 2, 3...) حتى بعد الحذف.</td>
+                    <td>منع الفجوات الرقمية التي كانت تُربك العاملين عند مراجعة الكشوفات.</td>
+                </tr>
+                <tr>
+                    <td><strong>البحث اللحظي (Filter Table)</strong></td>
+                    <td>حقل إدخال بحدث <code>oninput</code> يفلتر الأصناف فوراً بمجرد كتابة الاسم.</td>
+                    <td>العثور على القماش ومعرفة رصيده المتبقي في أقل من ثانيتين أمام الزبون.</td>
+                </tr>
+                <tr>
+                    <td><strong>التحديد المتعدد (Checkboxes)</strong></td>
+                    <td>مربعات اختيار لكل صنف مع زر (تحديد الكل) وزر <code>[حذف المحدد]</code>.</td>
+                    <td>احتساب رأس مال مجموعة أصناف محددة أو حذف أصناف تالفة دفعة واحدة.</td>
+                </tr>
+                <tr>
+                    <td><strong>الشريط الإحصائي السفلي</strong></td>
+                    <td>يعرض: (عدد أنواع المنتجات المعروضة) و (إجمالي قيمة المخزن بالجنيه).</td>
+                    <td>إعطاء المالك إجمالي رأس المال الميت والمتحرك في المخزن لحظة بلحظة.</td>
+                </tr>
+                <tr>
+                    <td><strong>طباعة الكشوفات الورقية</strong></td>
+                    <td>زر <code>[طباعة الكشوفات]</code> مع стилі <code>@media print</code> لإخفاء التحكم.</td>
+                    <td>تسليم العاملين نسخة ورقية لمطابقتها مع طاقات وثياب الأقمشة على الأرفف.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 4. Sales & POS -->
+        <div class="section-title">4. شاشة نقطة البيع والفواتير السريعة (Mstock POS Engine)</div>
+        <p class="section-desc">صُممت شاشة الكاشير لسرعة الإنجاز أمام الزبائن عبر نافذة البيع المنبثقة <code>pos-order-modal</code>:</p>
+        
+        <div class="card-box">
+            <div class="card-box-title">⚡ خطوات تدفق الفاتورة في Mstock:</div>
+            <ol class="numbered-list" style="margin-bottom: 10px;">
+                <li>النقر على زر <code>[إنشاء طلب جديد]</code>.</li>
+                <li>البحث الذكي المنسدل عن القماش واختياره مع إظهار سعر الجملة والكمية المتاحة.</li>
+                <li>إدخال الكمية بالأمتار وتعديل السعر حسب الاتفاق مع الزبون.</li>
+                <li>النقر على زر <code>[إضافة للجدول]</code> لإدراج البند بالفاتورة.</li>
+                <li>اختيار وسيلة السداد (نقدي / فودافون كاش / تقسيم).</li>
+                <li>النقر على <code>[حفظ الفاتورة]</code> التي تخصم الكمية فورياً من المخزن وتسجلها بسجل الوردية.</li>
+            </ol>
+            <p><strong>خيارات السداد الثلاثة المعتمدة:</strong></p>
+            <ul class="styled-list">
+                <li><span class="list-title">نقدي (Cash):</span> إدخال المبلغ المدفوع وحساب الباقي (Change Due) تلقائياً لتفادي أخطاء الحساب.</li>
+                <li><span class="list-title">فودافون كاش (VF Cash):</span> اختيار رقم محفظة المحل المحول إليها من القائمة المعتمدة (01012345678، 01099887766).</li>
+                <li><span class="list-title">دفع مقسم (Split Payment):</span> إمكانية سداد جزء نقد وجزء محفظة إلكترونية لنفس الفاتورة.</li>
+            </ul>
+        </div>
+
+        <!-- 5. Suppliers -->
+        <div class="section-title">5. شاشة منظومة الموردين والتوريد الآلي (Suppliers & Purchasing)</div>
+        <p class="section-desc">تحل هذه الشاشة مشكلة فوضى دفاتر تجار الجملة وتوريد البضاعة عبر تبويبين مخصصين:</p>
+        
+        <ol class="numbered-list">
+            <li><span class="list-title">نافذة [اضافة بضاعة جديدة]:</span> إدخال اسم القماش، الكمية بالأمتار، إجمالي سعر الجملة، المورد المعتمد، والمدفوع نقداً، ويقوم البرنامج تلقائياً بزيادة رصيد القماش في المخزن وتثبيت باقي المبلغ في مديونية التاجر آلياً.</li>
+            <li><span class="list-title">نافذة [تحصيل مديونية]:</span> جلب مديونية التاجر، إدخال دفعة السداد مع فحص أمني يمنع دفع مبالغ تزيد عن المديونية، وتحديث الرصيد فورياً بسجل تاريخي.</li>
+            <li><span class="list-title">سجل وأرشيف حركات التجار:</span> جدول كامل يوثق كل توريد وسداد بالتاريخ والوقت مع إمكانية التعديل والطباعة كـ PDF.</li>
+            <li><span class="list-title">دليل تجار الأقمشة المعتمدين:</span> جهات الاتصال (مثل: شركة الأمل للمنسوجات، مصنع الحرير العربي)، يعرض هواتفهم ومديونياتهم وملاحظات الخامات مع زر تفعيل أو إيقاف التاجر.</li>
+        </ol>
+
+        <!-- 6. Reports -->
+        <div class="section-title">6. شاشة التقارير والأرباح الصافية (Financial Reports Matrix)</div>
+        <p class="section-desc">جدول التحليلات المالية الدقيقة المبرمجة في النظام:</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">المؤشر المالي</th>
+                    <th style="width: 40%;">طريقة الحساب البرمجية في Mstock</th>
+                    <th style="width: 35%;">الأثر الميداني على إدارة المحل</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>إجمالي مبيعات الفترة</strong></td>
+                    <td>مجموع قيم فواتير الفترة المختارة (اليوم، أسبوع، شهر، سنة)</td>
+                    <td>معرفة حجم التداول المالي الإجمالي للمحل.</td>
+                </tr>
+                <tr>
+                    <td><strong>صافي الأرباح المحققة</strong></td>
+                    <td>سعر البيع الفعلي مطروحاً منه سعر تكلفة الشراء المرجعي</td>
+                    <td>تحديد المكسب الحقيقي المستفاد دون المساس برأس المال.</td>
+                </tr>
+                <tr>
+                    <td><strong>إجمالي النقدي (الدرج)</strong></td>
+                    <td>تجميع المدفوعات النقدية الخالصة وجزء الكاش من الدفع المقسم</td>
+                    <td>مطابقة النقدية الموجودة في الدرج ومنع أي عجز أو سرقات.</td>
+                </tr>
+                <tr>
+                    <td><strong>إجمالي فودافون كاش</strong></td>
+                    <td>تجميع المبالغ المحولة على أرقام محافظ المحل</td>
+                    <td>مطابقة رسائل الهواتف مع فواتير الكاشير بدقة.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 7. Backup -->
+        <div class="section-title">7. النسخ الاحتياطي وحماية البيانات - شرط العميل الحرج (Zero-Subscription Engine)</div>
+        <div class="card-box alert">
+            <div class="card-box-title">🔒 تنفيذ شرط العميل (حفظ البيانات محلياً وبدون أي اشتراكات دورية نهائياً):</div>
+            <ol class="numbered-list">
+                <li><span class="list-title">معمارية محلية كاملة (Offline-First):</span> البرنامج يعمل على قاعدة بيانات محلية مدمجة وسريعة لا تتطلب اتصالاً بالإنترنت ولا تفرض اشتراكات شهرية على المتجر.</li>
+                <li><span class="list-title">المزامنة المجانية عبر Google Drive API:</span> زر <code>[رفع البيانات]</code> يرفع نسخة احتياطية من قاعدة بيانات المتجر إلى حساب جوجل درايف الشخصي للمحل مجاناً، وزر <code>[استرجاع البيانات المحفوظة]</code> يسترد كامل الحسابات بضغطة واحدة.</li>
+                <li><span class="list-title">الجدولة التلقائية للنسخ السحابي:</span> خيار لتحديد وتيرة النسخ السحابي التلقائي (كل 30 دقيقة، ساعة، 12 ساعة، يوم، أسبوع...).</li>
+                <li><span class="list-title">الأمان وقفل PIN التلقائي:</span> تشفير رمز الدخول بـ SHA-256، مع مؤقت خمول لقفل الشاشة تلقائياً لحماية أرقام الأرباح ورأس المال من تطفل الزبائن.</li>
+                <li><span class="list-title">رخصة العتاد الرقمية (Supabase HWID):</span> ربط تفعيل البرنامج بالبصمة الرقمية للكمبيوتر لضمان عدم النسخ غير المشروع دون دفع أي مليم لاشتراكات شهرية.</li>
+            </ol>
+        </div>
+
+        <!-- 8. UX 3 Levels -->
+        <div class="section-title">8. هندسة تجربة المستخدم وفق المستويات الثلاثة في Mstock (3-Level UX Model)</div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 30%;">المستوى</th>
+                    <th style="width: 70%;">الوظائف المتاحة في Mstock POS</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>المستوى الأول (Level 1)<br>العمليات اليومية اللحظية</strong></td>
+                    <td>إصدار فواتير الكاشير، البحث السريع عن الأقمشة، اختيار وسيلة السداد (كاش/محفظة/مقسم)، وإضافة وتوريد شحنات البضاعة.</td>
+                </tr>
+                <tr>
+                    <td><strong>المستوى الثاني (Level 2)<br>الإدارة والمتابعة والرقابة</strong></td>
+                    <td>جرد أمتار المخزن، تتبع كشوف حسابات الموردين ومديونياتهم، مراجعة أرشيف الفواتير القديمة ومطابقة رصيد الدرج.</td>
+                </tr>
+                <tr>
+                    <td><strong>المستوى الثالث (Level 3)<br>التحليل المالي واتخاذ القرار</strong></td>
+                    <td>متابعة صافي الأرباح، تقييم رأس المال المخزني المعروض، مراقبة السيولة النقدية، وجدولة طلبيات الأقمشة الجديدة.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 9. Final Architecture -->
+        <div class="section-title">9. الشكل النهائي المعتمد للتنفيذ ونظام النوافذ الموحد</div>
+        <p class="section-desc">تم اعتماد معمارية <strong>شاشات رئيسية هادئة تعتمد على نوافذ منبثقة تفاعلية (Focused Modals)</strong> بدلاً من التكديس في شاشة واحدة، مما وحّد لغة التصميم (نفس مواضع أزرار الحفظ الخضراء والإلغاء الحمراء)، وجعل تدريب عمال المتجر لا يستغرق أكثر من 15 دقيقة.</p>
+
+    </div>
+
+</body>
+</html>

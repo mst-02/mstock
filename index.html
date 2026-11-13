@@ -132,10 +132,10 @@
         body.dark-mode .modal .modal-header { border-bottom-color: #334155; }
         .close-btn { cursor: pointer; font-size: 24px; color: #64748b; line-height: 1; }
         .close-btn:hover { color: var(--danger-color); }
-        .modal-box { background: var(--card-bg); color: var(--text-main); padding: 25px; border-radius: 10px; width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); border: 1px solid #cbd5e1; }
+        .modal-box { background: var(--card-bg); color: var(--text-main); padding: 25px; border-radius: 10px; width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); border: 1px solid #cbd5e1; max-height: 90vh; overflow-y: auto; }
         .form-control { display: flex; flex-direction: column; margin-bottom: 12px; position: relative; }
         .form-control label { font-weight: 600; margin-bottom: 5px; color: var(--text-main); }
-        .form-control input, .form-control select { padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; background: var(--card-bg); color: var(--text-main); }
+        .form-control input, .form-control select { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; background: var(--card-bg); color: var(--text-main); }
         body.dark-mode .form-control input, body.dark-mode .form-control select, body.dark-mode .search-bar { border-color: #475569; background: #0f172a; color: #f8fafc; }
         body.dark-mode input:disabled, body.dark-mode input[readonly], body.dark-mode select:disabled { background-color: #1e293b; border-color: #334155; color: #94a3b8; }
         body.dark-mode input::placeholder { color: #94a3b8; }
@@ -542,11 +542,112 @@
         </div>
     </div>
 
+    <div id="creditor-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="creditor-modal-title">بيانات العميل</h3>
+            <div class="form-control">
+                <label>اسم العميل</label>
+                <input type="text" id="creditor-name" placeholder="أدخل اسم العميل...">
+            </div>
+            <div class="form-control">
+                <label>رقم الهاتف</label>
+                <input type="text" id="creditor-phone" placeholder="أدخل رقم الهاتف...">
+            </div>
+            <div class="form-control">
+                <label>ملحوظة أو تفاصيل العنوان</label>
+                <input type="text" id="creditor-note" placeholder="مثال: يسكن في شارع المحطة...">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="closeCreditorModal()">إلغاء</button>
+                <button class="btn btn-success" onclick="saveCreditorData()">حفظ العميل</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="creditor-delete-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 400px; text-align: center;">
+            <h3 style="color: var(--danger-color);">تأكيد الحذف</h3>
+            <p>هل أنت متأكد من حذف هذا العميل من المنظومة؟ (لا يمكن التراجع)</p>
+            <div class="modal-footer" style="justify-content: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeCreditorDeleteModal()">إلغاء</button>
+                <button class="btn btn-danger" onclick="confirmDeleteCreditor()">نعم، احذف</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="credit-supply-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 600px;">
+            <h3 style="text-align: center;">إجراء سحب بضاعة شكك</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-control">
+                    <label>العميل (الشكك)</label>
+                    <input type="text" id="credit-supply-merchant-search" placeholder="ابحث عن العميل..." oninput="handleCreditSupplyMerchantSearch(this.value)">
+                    <div id="credit-supply-merchant-results" class="live-search-results"></div>
+                </div>
+                <div class="form-control">
+                    <label>اسم الصنف/المنتج</label>
+                    <!-- استخدام نفس طريقة البحث في نقطة البيع للمخزن إذا أردت أو كتابة حرة مع سحب تلقائي -->
+                    <input type="text" id="credit-supply-prod-name" placeholder="ابحث في المخزن..." oninput="handleCreditSupplyProductSearch(this.value)">
+                    <div id="credit-supply-product-results" class="live-search-results"></div>
+                </div>
+                <div class="form-control">
+                    <label>الكمية المسحوبة</label>
+                    <input type="number" id="credit-supply-qty" placeholder="مثال: 50" oninput="calculateCreditSupplyTotal()">
+                </div>
+                <div class="form-control">
+                    <label>سعر الوحدة للعميل (قطاعي/جملة)</label>
+                    <input type="number" id="credit-supply-price" placeholder="مثال: 150" oninput="calculateCreditSupplyTotal()">
+                </div>
+                <div class="form-control">
+                    <label>المبلغ المدفوع كدفعة أولى</label>
+                    <input type="number" id="credit-supply-paid" placeholder="0" oninput="calculateCreditSupplyTotal()">
+                </div>
+                <div class="form-control">
+                    <label>المديونية المضافة للعميل</label>
+                    <input type="number" id="credit-supply-debt-total" readonly style="background:#e2e8f0; font-weight:bold;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="closeCreditSupplyModal()">إلغاء</button>
+                <button class="btn btn-success" onclick="saveCreditSupplyTransaction()">حفظ وخصم من المخزن</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="credit-collection-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 550px;">
+            <h3 style="text-align: center;">إجراء تحصيل دفعة من شكك</h3>
+            <div class="form-control">
+                <label>العميل</label>
+                <input type="text" id="credit-coll-merchant-search" placeholder="ابحث عن العميل..." oninput="handleCreditCollectionMerchantSearch(this.value)">
+                <div id="credit-coll-merchant-results" class="live-search-results"></div>
+            </div>
+            <div class="form-control">
+                <label>المديونية الحالية المعتمدة</label>
+                <input type="number" id="credit-coll-current-debt" readonly style="background:#e2e8f0; font-weight:bold;">
+            </div>
+            <div class="form-control">
+                <label>مبلغ التحصيل (السداد)</label>
+                <input type="number" id="credit-coll-amount" placeholder="0" oninput="calculateCreditCollectionBalance()">
+                <div id="credit-coll-warning-msg" style="color: var(--danger-color); font-weight:bold; margin-top:5px; display:none;">المبلغ أكبر من المديونية</div>
+            </div>
+            <div class="form-control">
+                <label>المديونية المتبقية</label>
+                <input type="number" id="credit-coll-remaining-debt" readonly style="background:#e2e8f0; font-weight:bold;">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="closeCreditCollectionModal()">إلغاء</button>
+                <button class="btn btn-success" id="credit-coll-save-btn" onclick="saveCreditCollectionTransaction()">حفظ وموازنة السجل</button>
+            </div>
+        </div>
+    </div>
+
     <div class="sidebar">
         <h2>Mstock POS</h2>
         <button class="nav-btn active" id="menu-cashier" onclick="switchPage('cashier-page')">نقطة البيع</button>
         <button class="nav-btn" id="menu-stock" onclick="switchPage('stock-page')">إدارة المخزن</button>
         <button class="nav-btn" id="menu-merchants" onclick="switchPage('merchants-page')">إدارة التجار</button>
+        <button class="nav-btn" id="menu-creditors" onclick="switchPage('creditors-page')">إدارة الشكك</button>
         <button class="nav-btn" id="menu-tasfeya" onclick="switchPage('tasfeya-log-page')">سجل التصفية</button>
         <button class="nav-btn" id="menu-settings" onclick="switchPage('settings-page')">الإعدادات والأمان</button>
     </div>
@@ -558,6 +659,7 @@
             
             <div class="order-box" id="pos-creation-zone" style="display: flex; justify-content: center; align-items: center; gap: 20px; padding: 30px 20px;">
                 <button class="btn btn-primary" style="padding: 15px 40px; font-size: 18px;" onclick="openPosOrderModal()">إنشاء طلب جديد</button>
+                <button class="btn btn-warning" style="padding: 12px 28px; font-size: 17px; color: white;" onclick="openTailoringModal()">التفصيل</button>
                 <button class="btn btn-danger" style="padding: 10px 20px; font-size: 16px; border-radius: 6px; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: bold; transition: transform 0.2s;" onclick="openTasfeyaModal()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21H4a2 2 0 0 1-2-2V5c0-1.1.9-2 2-2h5l2 3h9a2 2 0 0 1 2 2v2"></path><path d="M19 15v6"></path><path d="M16 18h6"></path></svg>
                     تصفية اليوم
@@ -744,6 +846,78 @@
             </div>
         </div>
 
+        <!-- صفحة إدارة الشكك -->
+        <div id="creditors-page" class="page">
+            <div class="header"><h1>منظومة إدارة الشكك والعملاء الآجلة</h1></div>
+            <div class="tabs-header">
+                <button class="tab-link active" onclick="switchCreditorPageTab(event, 'sub-tab-credit-supply')">بضاعة وتحصيل</button>
+                <button class="tab-link" onclick="switchCreditorPageTab(event, 'sub-tab-credit-list')">العملاء الشكك</button>
+            </div>
+
+            <div id="sub-tab-credit-supply" class="tab-content active">
+                <div class="stock-controls" style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="openCreditSupplyModal()">سحب بضاعة شكك</button>
+                    <button class="btn btn-success" onclick="openCreditCollectionModal()">تحصيل دفعة</button>
+                </div>
+                <div class="order-box">
+                    <div class="tabs-header">
+                        <button class="tab-link active" id="tx-credit-reg-link" onclick="switchCreditTxTab('tx-credit-registry-content')">سجل حركات العملاء</button>
+                        <button class="tab-link" id="tx-credit-arc-link" onclick="switchCreditTxTab('tx-credit-archive-content')">أرشيف حركات العملاء</button>
+                    </div>
+                    <div id="tx-credit-registry-content" class="tab-content-tx-credit">
+                        <table style="width: 100%;">
+                            <thead>
+                                <tr style="background: rgba(0,0,0,0.02);">
+                                    <th>العميل</th>
+                                    <th>نوع العملية</th>
+                                    <th>المبلغ الكلي</th>
+                                    <th>التاريخ والوقت</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tx-credit-registry-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div id="tx-credit-archive-content" class="tab-content-tx-credit" style="display: none;">
+                        <table style="width: 100%;">
+                            <thead>
+                                <tr style="background: rgba(0,0,0,0.02);">
+                                    <th>العميل</th>
+                                    <th>نوع العملية</th>
+                                    <th>المبلغ الكلي</th>
+                                    <th>التاريخ والوقت</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tx-credit-archive-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sub-tab-credit-list" class="tab-content">
+                <div class="stock-controls" style="justify-content: flex-start; margin-bottom: 25px;">
+                    <button class="btn btn-primary" onclick="openCreditorModal()">إضافة عميل جديد</button>
+                </div>
+                <h3>العملاء الحاليين المعتمدين بالمنظومة</h3>
+                <div class="table-container-wrapper">
+                    <table>
+                        <thead>
+                            <tr style="background: rgba(0,0,0,0.02);">
+                                <th>اسم العميل</th>
+                                <th>رقم الهاتف</th>
+                                <th>المديونية (ج.م)</th>
+                                <th>الملحوظة</th>
+                                <th class="no-print">التحكم والعمليات الحركية</th>
+                                <th>حالة النشاط</th>
+                            </tr>
+                        </thead>
+                        <tbody id="creditors-list-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- صفحة سجل التصفية -->
         <div id="tasfeya-log-page" class="page">
             <div class="header"><h1>سجل التصفية</h1></div>
@@ -900,9 +1074,28 @@
             <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 15px;">
                 <button class="btn btn-danger" style="flex: 1; min-width: 180px;" onclick="deleteAllMerchantLog()">حذف سجل حركة التجار بالكامل</button>
                 <button class="btn btn-danger" style="flex: 1; min-width: 180px;" onclick="deleteAllInvoicesLog()">حذف سجل الفواتير بالكامل</button>
+                <button class="btn btn-danger" style="flex: 1; min-width: 180px;" onclick="deleteAllTasfeyaLog()">حذف سجل التصفية بالكامل</button>
             </div>
             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                 <button id="system-update-btn" class="btn btn-success" style="flex: 1; min-width: 180px;" onclick="checkForSystemUpdates()">تحديث البرنامج</button>
+            </div>
+            <div id="update-progress-container" style="display: none; margin-top: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; color: #64748b; font-weight: bold;">
+                    <span id="update-progress-text">جاري التحميل: 0%</span>
+                    <span id="update-progress-size">0 MB / 0 MB</span>
+                </div>
+                <div style="width: 100%; background: #e2e8f0; border-radius: 8px; height: 16px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);">
+                    <div id="update-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-box" style="margin-bottom: 30px;">
+            <h3 style="margin-top: 0; color: #10b981; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 8px;">تهيئة الأرصدة الافتتاحية</h3>
+            <p style="font-size: 14px; color: #64748b; margin-bottom: 15px;">إضافة مديونيات سابقة للأشخاص دون التأثير على بضاعة المخزن.</p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-primary" style="flex: 1; min-width: 180px;" onclick="document.getElementById('opening-balance-merchant-modal').style.display='flex'">تسجيل رصيد افتتاحي (موردين)</button>
+                <button class="btn btn-warning" style="flex: 1; min-width: 180px; color: white;" onclick="document.getElementById('opening-balance-creditor-modal').style.display='flex'">تسجيل رصيد افتتاحي (عملاء شكك)</button>
             </div>
         </div>
 
@@ -926,6 +1119,9 @@
             { id: 1, merchantId: 1, merchantName: "شركة الأمل للمنسوجات", type: "إضافة بضاعة", amount: 5000, date: "2026/06/29", archived: false }
         ];
 
+        let creditorsList = [];
+        let creditorTransactions = [];
+
         let invoiceRegistry = [];
         let invoiceArchive = [];
         let tasfeyaRegistry = [];
@@ -945,12 +1141,15 @@
         let currentPageId = 'cashier-page';
         let currentMerchantTab = 'sub-tab-supply';
         let currentMerchantTxTab = 'tx-registry-content';
+        let currentCreditorTab = 'sub-tab-credit-list';
+        let currentCreditorTxTab = 'tx-credit-registry-content';
 
         const { google } = require('googleapis');
         const fs = require('fs');
         const path = require('path');
         const os = require('os');
         const dbPath = path.join(os.homedir(), 'mstock_local_db.json');
+        let isDataLoadedSuccessfully = true;
         const { createClient } = require('@supabase/supabase-js');
         const { machineIdSync } = require('node-machine-id');
         const crypto = require('crypto');
@@ -1578,7 +1777,19 @@
             } else {
                 const now = new Date();
                 if(range === 'today') {
-                    filtered = filtered.filter(i => new Date(i.timestamp).toDateString() === now.toDateString());
+                    let lastTasfeyaTime = 0;
+                    if (typeof tasfeyaRegistry !== 'undefined') {
+                        tasfeyaRegistry.forEach(t => {
+                            const d = new Date(t.timestamp);
+                            if (d.toDateString() === now.toDateString() && d.getTime() > lastTasfeyaTime) {
+                                lastTasfeyaTime = d.getTime();
+                            }
+                        });
+                    }
+                    filtered = filtered.filter(i => {
+                        const iDate = new Date(i.timestamp);
+                        return iDate.toDateString() === now.toDateString() && iDate.getTime() > lastTasfeyaTime;
+                    });
                 } else if(range === 'week') {
                     filtered = filtered.filter(i => (now - new Date(i.timestamp)) <= 7*24*60*60*1000);
                 } else if(range === 'month') {
@@ -1589,10 +1800,10 @@
             }
 
             const salesTotal = filtered.reduce((s, i)=> s + i.total, 0);
-            const profitTotal = filtered.reduce((sum, inv) => sum + inv.items.reduce((itemSum, item) => {
+            const profitTotal = filtered.reduce((sum, inv) => sum + (inv.items.reduce((itemSum, item) => {
                 const costPrice = typeof item.costPrice === 'number' ? item.costPrice : 0;
                 return itemSum + ((item.price - costPrice) * item.qty);
-            }, 0), 0);
+            }, 0) - (inv.discount || 0)), 0);
             let cashTotal = 0;
             let vfTotal = 0;
             filtered.forEach(inv => {
@@ -1600,6 +1811,110 @@
                 cashTotal += (parseFloat(inv.cashAmount) || 0) - change;
                 vfTotal += parseFloat(inv.vfAmount) || 0;
             });
+
+            // إضافة أرباح ومبيعات الشكك للفترة المحددة
+            let creditorTxFiltered = [...creditorTransactions];
+            if (!isCurrentDay && typeof tasfeyaRegistry !== 'undefined') {
+                tasfeyaRegistry.forEach(t => {
+                    if (t.creditorTransactions) {
+                        creditorTxFiltered = [...creditorTxFiltered, ...t.creditorTransactions];
+                    }
+                });
+            }
+            if(picker) {
+                creditorTxFiltered = creditorTxFiltered.filter(tx => {
+                    const d = new Date(tx.timestamp);
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth()+1).padStart(2,'0');
+                    const day = String(d.getDate()).padStart(2,'0');
+                    return `${y}-${m}-${day}` === picker;
+                });
+            } else {
+                const now = new Date();
+                if(range === 'today') {
+                    let lastTasfeyaTime = 0;
+                    if (typeof tasfeyaRegistry !== 'undefined') {
+                        tasfeyaRegistry.forEach(t => {
+                            const d = new Date(t.timestamp);
+                            if (d.toDateString() === now.toDateString() && d.getTime() > lastTasfeyaTime) {
+                                lastTasfeyaTime = d.getTime();
+                            }
+                        });
+                    }
+                    creditorTxFiltered = creditorTxFiltered.filter(i => {
+                        const iDate = new Date(i.timestamp);
+                        return iDate.toDateString() === now.toDateString() && iDate.getTime() > lastTasfeyaTime;
+                    });
+                } else if(range === 'week') {
+                    creditorTxFiltered = creditorTxFiltered.filter(i => (now - new Date(i.timestamp)) <= 7*24*60*60*1000);
+                } else if(range === 'month') {
+                    creditorTxFiltered = creditorTxFiltered.filter(i => (now - new Date(i.timestamp)) <= 30*24*60*60*1000);
+                } else if(range === 'year') {
+                    creditorTxFiltered = creditorTxFiltered.filter(i => new Date(i.timestamp).getFullYear() === now.getFullYear());
+                }
+            }
+
+            let creditorSales = 0;
+            let creditorProfit = 0;
+            let creditorCollections = 0;
+            creditorTxFiltered.forEach(tx => {
+                if(tx.type.includes("تحصيل")) {
+                    creditorCollections += tx.amount;
+                    creditorSales += (tx.salesPart || 0);
+                    creditorProfit += (tx.profitPart || 0);
+                }
+            });
+
+            // خصم دفعات التجار (الموردين) من الدرج
+            let merchantTxFiltered = [...merchantTransactions];
+            if (!isCurrentDay && typeof tasfeyaRegistry !== 'undefined') {
+                tasfeyaRegistry.forEach(t => {
+                    if (t.merchantTransactions) {
+                        merchantTxFiltered = [...merchantTxFiltered, ...t.merchantTransactions];
+                    }
+                });
+            }
+            if(picker) {
+                merchantTxFiltered = merchantTxFiltered.filter(tx => {
+                    const d = new Date(tx.timestamp);
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth()+1).padStart(2,'0');
+                    const day = String(d.getDate()).padStart(2,'0');
+                    return `${y}-${m}-${day}` === picker;
+                });
+            } else {
+                const now = new Date();
+                if(range === 'today') {
+                    let lastTasfeyaTime = 0;
+                    if (typeof tasfeyaRegistry !== 'undefined') {
+                        tasfeyaRegistry.forEach(t => {
+                            const d = new Date(t.timestamp);
+                            if (d.toDateString() === now.toDateString() && d.getTime() > lastTasfeyaTime) {
+                                lastTasfeyaTime = d.getTime();
+                            }
+                        });
+                    }
+                    merchantTxFiltered = merchantTxFiltered.filter(i => {
+                        const iDate = new Date(i.timestamp);
+                        return iDate.toDateString() === now.toDateString() && iDate.getTime() > lastTasfeyaTime;
+                    });
+                } else if(range === 'week') {
+                    merchantTxFiltered = merchantTxFiltered.filter(i => (now - new Date(i.timestamp)) <= 7*24*60*60*1000);
+                } else if(range === 'month') {
+                    merchantTxFiltered = merchantTxFiltered.filter(i => (now - new Date(i.timestamp)) <= 30*24*60*60*1000);
+                } else if(range === 'year') {
+                    merchantTxFiltered = merchantTxFiltered.filter(i => new Date(i.timestamp).getFullYear() === now.getFullYear());
+                }
+            }
+            merchantTxFiltered.forEach(tx => {
+                if(tx.type === "تحصيل") {
+                    cashTotal -= tx.amount;
+                }
+            });
+
+            const finalSalesTotal = salesTotal + creditorSales;
+            const finalProfitTotal = profitTotal + creditorProfit;
+            const finalCashTotal = cashTotal + creditorCollections;
             const soldPieces = filtered.reduce((sum, inv) => sum + inv.items.reduce((pieceSum, item) => pieceSum + item.qty, 0), 0);
             const productCounts = {};
             filtered.forEach(inv => inv.items.forEach(item => {
@@ -1607,9 +1922,9 @@
             }));
             const topProducts = Object.entries(productCounts).sort((a,b) => b[1]-a[1]).slice(0,3);
 
-            document.getElementById('report-sales-total').innerText = `${salesTotal} ج.م`;
-            document.getElementById('report-profit-total').innerText = `${profitTotal} ج.م`;
-            document.getElementById('report-cash-total').innerText = `${cashTotal} ج.م`;
+            document.getElementById('report-sales-total').innerText = `${finalSalesTotal} ج.م`;
+            document.getElementById('report-profit-total').innerText = `${finalProfitTotal} ج.م`;
+            document.getElementById('report-cash-total').innerText = `${finalCashTotal} ج.م`;
             document.getElementById('report-vf-total').innerText = `${vfTotal} ج.م`;
             const panel = document.getElementById('report-details-panel');
             panel.innerHTML = `
@@ -1987,6 +2302,331 @@
             try { localStorage.setItem('mstock_activeMerchantTxTab', id); } catch(e) { console.error('merchantTxTab storage', e); }
         }
 
+        // --- إدارة الشكك والعملاء الآجلة ---
+        let editingCreditorId = null;
+        let deletingCreditorId = null;
+
+        function renderCreditorsTable() {
+            const tbody = document.getElementById('creditors-list-tbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            creditorsList.forEach(m => {
+                const tr = document.createElement('tr');
+                if(!m.active) tr.className = 'faded-row';
+                tr.innerHTML = `
+                    <td><strong>${escapeHTML(m.name)}</strong></td>
+                    <td>${m.phone}</td>
+                    <td style="color:var(--danger-color); font-weight:bold;">${m.debt} ج.م</td>
+                    <td>${escapeHTML(m.note)}</td>
+                    <td class="no-print">
+                        <button class="btn btn-primary btn-sm" onclick="openEditCreditorModal(${m.id})">تعديل</button>
+                        <button class="btn btn-danger btn-sm" onclick="openDeleteCreditorModal(${m.id})">حذف</button>
+                    </td>
+                    <td>
+                        <label class="toggle-switch">
+                            <input type="checkbox" ${m.active?'checked':''} onchange="toggleCreditorActiveStatus(${m.id}, this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleCreditorActiveStatus(id, checked) {
+            const m = creditorsList.find(i=>i.id === id);
+            if(m) { m.active = checked; renderCreditorsTable(); showToast("تم تحديث حالة العميل", "success"); saveAppState(); }
+        }
+
+        function openCreditorModal() {
+            editingCreditorId = null;
+            document.getElementById('creditor-modal-title').innerText = "بيانات العميل";
+            document.getElementById('creditor-name').value = '';
+            document.getElementById('creditor-phone').value = '';
+            document.getElementById('creditor-note').value = '';
+            document.getElementById('creditor-modal').style.display = 'flex';
+        }
+
+        function openEditCreditorModal(id) {
+            const m = creditorsList.find(i=>i.id === id); if(!m) return;
+            editingCreditorId = id;
+            document.getElementById('creditor-modal-title').innerText = "تعديل بيانات العميل";
+            document.getElementById('creditor-name').value = m.name;
+            document.getElementById('creditor-phone').value = m.phone;
+            document.getElementById('creditor-note').value = m.note;
+            document.getElementById('creditor-modal').style.display = 'flex';
+        }
+
+        function closeCreditorModal() { document.getElementById('creditor-modal').style.display = 'none'; }
+
+        function saveCreditorData() {
+            const name = document.getElementById('creditor-name').value.trim();
+            const phone = document.getElementById('creditor-phone').value.trim();
+            const note = document.getElementById('creditor-note').value.trim();
+            if(!name || !phone) { showToast("برجاء ملء حقول الاسم والهاتف الأساسية!", "error"); return; }
+
+            if(editingCreditorId !== null) {
+                const m = creditorsList.find(i=>i.id === editingCreditorId);
+                if(m) { m.name = name; m.phone = phone; m.note = note; }
+                showToast("تم تحديث بيانات العميل بنجاح", "success");
+            } else {
+                creditorsList.push({ id: Date.now(), name, phone, debt: 0, note, active: true });
+                showToast("تم إضافة العميل الجديد بنجاح", "success");
+            }
+            closeCreditorModal(); renderCreditorsTable();
+            saveAppState();
+        }
+
+        function openDeleteCreditorModal(id) { deletingCreditorId = id; document.getElementById('creditor-delete-modal').style.display = 'flex'; }
+        function closeCreditorDeleteModal() { document.getElementById('creditor-delete-modal').style.display = 'none'; }
+        function confirmDeleteCreditor() {
+            creditorsList = creditorsList.filter(i=>i.id !== deletingCreditorId);
+            closeCreditorDeleteModal(); renderCreditorsTable(); showToast("تم حذف العميل بنجاح", "success"); saveAppState();
+        }
+
+        // -- بضاعة شكك --
+        function openCreditSupplyModal() {
+            document.getElementById('credit-supply-prod-name').value = '';
+            document.getElementById('credit-supply-prod-name').removeAttribute('data-id');
+            document.getElementById('credit-supply-qty').value = '';
+            document.getElementById('credit-supply-price').value = '';
+            document.getElementById('credit-supply-merchant-search').value = '';
+            document.getElementById('credit-supply-merchant-search').removeAttribute('data-id');
+            document.getElementById('credit-supply-paid').value = '';
+            document.getElementById('credit-supply-debt-total').value = '0';
+            document.getElementById('credit-supply-modal').style.display = 'flex';
+        }
+        function closeCreditSupplyModal() { document.getElementById('credit-supply-modal').style.display = 'none'; }
+
+        function handleCreditSupplyMerchantSearch(val) {
+            const box = document.getElementById('credit-supply-merchant-results'); box.innerHTML = '';
+            if(!val.trim()) { box.style.display = 'none'; return; }
+            const activeMerchants = creditorsList.filter(m => m.active && m.name.toLowerCase().includes(val.toLowerCase()));
+            if(activeMerchants.length === 0) { box.style.display = 'none'; return; }
+            activeMerchants.forEach(m => {
+                const d = document.createElement('div'); d.className = 'live-search-item'; d.innerText = m.name;
+                d.onclick = () => {
+                    document.getElementById('credit-supply-merchant-search').value = m.name;
+                    document.getElementById('credit-supply-merchant-search').dataset.id = m.id;
+                    box.style.display = 'none'; calculateCreditSupplyTotal();
+                };
+                box.appendChild(d);
+            });
+            box.style.display = 'block';
+        }
+
+        function handleCreditSupplyProductSearch(val) {
+            const box = document.getElementById('credit-supply-product-results'); box.innerHTML = '';
+            if(!val.trim()) { box.style.display = 'none'; return; }
+            const res = stockProducts.filter(p => p.name.toLowerCase().includes(val.toLowerCase()));
+            if(res.length === 0) { box.style.display = 'none'; return; }
+            res.forEach(p => {
+                const d = document.createElement('div'); d.className = 'live-search-item'; d.innerText = `${p.name} (المتاح: ${p.qty})`;
+                d.onclick = () => {
+                    document.getElementById('credit-supply-prod-name').value = p.name;
+                    document.getElementById('credit-supply-prod-name').dataset.id = p.id;
+                    document.getElementById('credit-supply-price').value = p.price; // السعر المسجل مبدئياً
+                    box.style.display = 'none'; calculateCreditSupplyTotal();
+                };
+                box.appendChild(d);
+            });
+            box.style.display = 'block';
+        }
+
+        function calculateCreditSupplyTotal() {
+            const qty = parseInt(document.getElementById('credit-supply-qty').value) || 0;
+            const price = parseFloat(document.getElementById('credit-supply-price').value) || 0;
+            const paid = parseFloat(document.getElementById('credit-supply-paid').value) || 0;
+            document.getElementById('credit-supply-debt-total').value = Math.max(0, (qty * price) - paid);
+        }
+
+        function saveCreditSupplyTransaction() {
+            const prodName = document.getElementById('credit-supply-prod-name').value.trim();
+            const prodId = document.getElementById('credit-supply-prod-name').dataset.id;
+            const qty = parseInt(document.getElementById('credit-supply-qty').value);
+            const price = parseFloat(document.getElementById('credit-supply-price').value);
+            const paid = parseFloat(document.getElementById('credit-supply-paid').value) || 0;
+            const mId = parseInt(document.getElementById('credit-supply-merchant-search').dataset.id);
+
+            if(!prodName || !prodId || isNaN(qty) || isNaN(price) || isNaN(mId)) { showToast("ممنوع الحفظ! يجب ملء البيانات واختيار الصنف والعميل!", "error"); return; }
+            
+            const totalValue = qty * price;
+            if(paid > totalValue) { showToast("المبلغ المدفوع أكبر من القيمة الإجمالية.", "error"); return; }
+            
+            const m = creditorsList.find(i=>i.id === mId && i.active);
+            if(!m) { showToast("العميل غير متاح!", "error"); return; }
+
+            const prod = stockProducts.find(i=>i.id == prodId);
+            if(!prod || prod.qty < qty) { showToast("الكمية المطلوبة غير متوفرة في المخزن!", "error"); return; }
+
+            // خصم من المخزن
+            prod.qty -= qty;
+            
+            // حساب الربح للصنف المسحوب وتسجيله
+            const costPrice = prod.price; 
+            const profitFromThisSale = (price - costPrice) * qty;
+
+            const debtIncurred = Math.max(0, totalValue - paid);
+            m.debt += debtIncurred;
+            m.unpaidCost = (m.unpaidCost || 0) + (costPrice * qty);
+
+            creditorTransactions.push({
+                id: Date.now(), creditorId: mId, creditorName: m.name,
+                type: `سحب بضاعة (${prodName} - ${qty} ${qty>10?'قطعة/متر':'قطع/أمتار'})`, amount: totalValue, timestamp: new Date().toISOString(), archived: false, profit: profitFromThisSale
+            });
+
+            if(paid > 0) {
+                let salesPart = 0;
+                let profitPart = 0;
+                if (m.unpaidCost > 0) {
+                    if (paid <= m.unpaidCost) { salesPart = paid; m.unpaidCost -= paid; }
+                    else { salesPart = m.unpaidCost; profitPart = paid - m.unpaidCost; m.unpaidCost = 0; }
+                } else { profitPart = paid; }
+                
+                creditorTransactions.push({
+                    id: Date.now() + 1, creditorId: mId, creditorName: m.name,
+                    type: "تحصيل من سحب مباشر", amount: paid, salesPart: salesPart, profitPart: profitPart, timestamp: new Date().toISOString(), archived: false
+                });
+            }
+
+            closeCreditSupplyModal(); renderStockTable(); renderCreditorsTable(); renderCreditTxTable();
+            showToast("تم حفظ سحب البضاعة وتخصيم المخزن!", "success");
+            saveAppState();
+        }
+
+        // -- تحصيل شكك --
+        function openCreditCollectionModal() {
+            document.getElementById('credit-coll-merchant-search').value = '';
+            document.getElementById('credit-coll-merchant-search').removeAttribute('data-id');
+            document.getElementById('credit-coll-current-debt').value = '';
+            document.getElementById('credit-coll-amount').value = '';
+            document.getElementById('credit-coll-remaining-debt').value = '';
+            document.getElementById('credit-coll-warning-msg').style.display = 'none';
+            document.getElementById('credit-coll-save-btn').disabled = false;
+            document.getElementById('credit-collection-modal').style.display = 'flex';
+        }
+        function closeCreditCollectionModal() { document.getElementById('credit-collection-modal').style.display = 'none'; }
+
+        function handleCreditCollectionMerchantSearch(val) {
+            const box = document.getElementById('credit-coll-merchant-results'); box.innerHTML = '';
+            if(!val.trim()) { box.style.display = 'none'; return; }
+            const activeMerchants = creditorsList.filter(m => m.active && m.name.toLowerCase().includes(val.toLowerCase()));
+            activeMerchants.forEach(m => {
+                const d = document.createElement('div'); d.className = 'live-search-item'; d.innerText = m.name;
+                d.onclick = () => {
+                    document.getElementById('credit-coll-merchant-search').value = m.name;
+                    document.getElementById('credit-coll-merchant-search').dataset.id = m.id;
+                    document.getElementById('credit-coll-current-debt').value = m.debt;
+                    box.style.display = 'none'; calculateCreditCollectionBalance();
+                };
+                box.appendChild(d);
+            });
+            box.style.display = 'block';
+        }
+
+        function calculateCreditCollectionBalance() {
+            const currentDebt = parseFloat(document.getElementById('credit-coll-current-debt').value) || 0;
+            const collectAmount = parseFloat(document.getElementById('credit-coll-amount').value) || 0;
+            const warning = document.getElementById('credit-coll-warning-msg');
+            const saveBtn = document.getElementById('credit-coll-save-btn');
+
+            let remaining = currentDebt - collectAmount;
+            if(remaining < 0) {
+                warning.style.display = 'block'; saveBtn.disabled = true; document.getElementById('credit-coll-remaining-debt').value = 0;
+            } else {
+                warning.style.display = 'none'; saveBtn.disabled = false; document.getElementById('credit-coll-remaining-debt').value = remaining;
+            }
+        }
+
+        function saveCreditCollectionTransaction() {
+            const amount = parseFloat(document.getElementById('credit-coll-amount').value);
+            const mId = parseInt(document.getElementById('credit-coll-merchant-search').dataset.id);
+            if(isNaN(amount) || amount <= 0 || isNaN(mId)) { showToast("بيانات خاطئة", "error"); return; }
+            
+            const m = creditorsList.find(i=>i.id === mId);
+            if(!m) return;
+            if(amount > m.debt) { showToast("المبلغ أكبر من المديونية!", "error"); return; }
+
+            m.debt -= amount;
+            
+            let salesPart = 0;
+            let profitPart = 0;
+            if (m.unpaidCost > 0) {
+                if (amount <= m.unpaidCost) { salesPart = amount; m.unpaidCost -= amount; }
+                else { salesPart = m.unpaidCost; profitPart = amount - m.unpaidCost; m.unpaidCost = 0; }
+            } else { profitPart = amount; }
+
+            creditorTransactions.push({
+                id: Date.now(), creditorId: mId, creditorName: m.name,
+                type: "تحصيل ديون شكك", amount: amount, salesPart: salesPart, profitPart: profitPart, timestamp: new Date().toISOString(), archived: false
+            });
+
+            closeCreditCollectionModal(); renderCreditorsTable(); renderCreditTxTable();
+            showToast("تم تحصيل الدفعة بنجاح", "success");
+            saveAppState();
+        }
+
+        function switchCreditorPageTab(event, id) {
+            document.querySelectorAll('#creditors-page .tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('#creditors-page .tabs-header .tab-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(event) event.target.classList.add('active');
+            currentCreditorTab = id;
+            if(id === 'sub-tab-credit-list') renderCreditorsTable();
+            if(id === 'sub-tab-credit-supply') renderCreditTxTable();
+            try { localStorage.setItem('mstock_activeCreditorTab', id); } catch(e) {}
+        }
+
+        function switchCreditTxTab(id) {
+            document.querySelectorAll('.tab-content-tx-credit').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('#sub-tab-credit-supply .tabs-header .tab-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).style.display = 'block';
+            if(id==='tx-credit-registry-content') document.getElementById('tx-credit-reg-link').classList.add('active');
+            else document.getElementById('tx-credit-arc-link').classList.add('active');
+            currentCreditorTxTab = id;
+            renderCreditTxTable();
+            try { localStorage.setItem('mstock_activeCreditorTxTab', id); } catch(e) {}
+        }
+
+        function renderCreditTxTable() {
+            const regBody = document.getElementById('tx-credit-registry-tbody');
+            const arcBody = document.getElementById('tx-credit-archive-tbody');
+            if(!regBody || !arcBody) return;
+            regBody.innerHTML = ''; arcBody.innerHTML = '';
+            
+            const sortedTx = [...creditorTransactions].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            sortedTx.forEach(tx => {
+                const tr = document.createElement('tr');
+                const d = new Date(tx.timestamp);
+                const color = tx.type.includes("سحب") ? "var(--danger-color)" : "var(--success-color)";
+                tr.innerHTML = `
+                    <td><strong>${escapeHTML(tx.creditorName)}</strong></td>
+                    <td><span style="color:${color}; font-weight:bold;">${tx.type}</span></td>
+                    <td>${tx.amount} ج.م</td>
+                    <td>${d.toLocaleDateString('ar-EG')} ${d.toLocaleTimeString('ar-EG')}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCreditTx(${tx.id})">حذف السجل</button>
+                    </td>
+                `;
+                if(tx.archived) arcBody.appendChild(tr);
+                else regBody.appendChild(tr);
+            });
+        }
+
+        function deleteCreditTx(id) {
+            const tx = creditorTransactions.find(i=>i.id===id);
+            if(tx) {
+                if(tx.type.includes('سحب')) {
+                    showToast("تحذير: لحذف عملية سحب يجب تعديل رصيد العميل والمخزن يدوياً إن لزم", "warning");
+                } else if(tx.type.includes('تحصيل')) {
+                    showToast("تحذير: يجب تعديل مديونية العميل يدوياً", "warning");
+                }
+            }
+            creditorTransactions = creditorTransactions.filter(i=>i.id !== id);
+            saveAppState(); renderCreditTxTable(); showToast("تم حذف حركة الشكك نهائياً", "success");
+        }
+
         function printStockReport() {
             const selected = selectedProductIds.length > 0 ? stockProducts.filter(p => selectedProductIds.includes(p.id)) : stockProducts;
             const total = selected.reduce((sum, p) => sum + (p.qty * p.price), 0);
@@ -2080,6 +2720,17 @@
                 switchTxTab(savedMerchantTxTab);
             }
 
+            const savedCreditorTab = localStorage.getItem('mstock_activeCreditorTab');
+            if(savedCreditorTab) {
+                const tabBtn = Array.from(document.querySelectorAll('#creditors-page .tabs-header .tab-link')).find(btn => btn.getAttribute('onclick')?.includes(savedCreditorTab));
+                if(tabBtn) tabBtn.click();
+            }
+
+            const savedCreditorTxTab = localStorage.getItem('mstock_activeCreditorTxTab');
+            if(savedCreditorTxTab) {
+                switchCreditTxTab(savedCreditorTxTab);
+            }
+
             const savedInvoiceTab = localStorage.getItem('mstock_activeInvoiceTab');
             if(savedInvoiceTab) {
                 const tabBtn = Array.from(document.querySelectorAll('#invoice-tabs-zone .tab-link')).find(btn => btn.getAttribute('onclick')?.includes(savedInvoiceTab));
@@ -2097,6 +2748,7 @@
 
         // Persist important arrays to localStorage to avoid data loss between runs
         function saveAppState() {
+            if (!isDataLoadedSuccessfully) return; // منع التخريب لو فيه فشل في التحميل
             try {
                 // حفظ الإعدادات الخفيفة في localStorage
                 localStorage.setItem('mstock_nextInvoiceId', String(nextInvoiceId));
@@ -2107,15 +2759,29 @@
                 localStorage.setItem('mstock_activeInvoiceTab', currentInvoiceTab);
                 localStorage.setItem('mstock_activeMerchantTab', currentMerchantTab);
                 localStorage.setItem('mstock_activeMerchantTxTab', currentMerchantTxTab);
+                localStorage.setItem('mstock_activeCreditorTab', currentCreditorTab);
+                localStorage.setItem('mstock_activeCreditorTxTab', currentCreditorTxTab);
                 localStorage.setItem('mstock_gdriveAccount', gdriveAccountName || '');
                 localStorage.setItem('mstock_gdriveFileId', gdriveBackupFileId || '');
                 localStorage.setItem('mstock_autoBackup', autoBackupInterval);
 
                 // حفظ البيانات الثقيلة في ملف محلي بطريقة آمنة (Atomic Write) لتجنب تلف الملف عند انقطاع الكهرباء
                 const heavyData = {
+                    appSettings: {
+                        pinCode: currentPIN,
+                        pinEnabled: isPinEnabled,
+                        nextInvoiceId: nextInvoiceId,
+                        idleTimeLimit: idleTimeLimit,
+                        autoBackupInterval: autoBackupInterval,
+                        shopName: document.getElementById('cfg-shop-name') ? document.getElementById('cfg-shop-name').value : '',
+                        shopPhone: document.getElementById('cfg-shop-phone') ? document.getElementById('cfg-shop-phone').value : '',
+                        vfCash: document.getElementById('cfg-shop-vf-cash') ? document.getElementById('cfg-shop-vf-cash').value : ''
+                    },
                     stockProducts,
                     merchantsList,
                     merchantTransactions,
+                    creditorsList,
+                    creditorTransactions,
                     invoiceRegistry,
                     invoiceArchive,
                     tasfeyaRegistry
@@ -2130,10 +2796,33 @@
             try {
                 // استرجاع البيانات الثقيلة من الملف المحلي إن وُجد
                 if (fs.existsSync(dbPath)) {
-                    const heavyData = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+                    let heavyData;
+                    try {
+                        heavyData = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
+                    } catch (err) {
+                        isDataLoadedSuccessfully = false;
+                        console.error('JSON Parse Error', err);
+                        alert('تنبيه هام جداً: فشل في تحميل قاعدة البيانات بسبب انقطاع تيار أو تلف الملف. لتجنب مسح بياناتك، تم إيقاف الحفظ التلقائي.');
+                        return; // لا تكمل حتى لا يتم مسح البيانات
+                    }
+                    
+                    if(heavyData.appSettings) {
+                        const s = heavyData.appSettings;
+                        if(s.pinCode) localStorage.setItem('mstock_pinCode', s.pinCode);
+                        if(s.pinEnabled !== undefined) localStorage.setItem('mstock_pinEnabled', s.pinEnabled ? '1' : '0');
+                        if(s.nextInvoiceId) localStorage.setItem('mstock_nextInvoiceId', s.nextInvoiceId);
+                        if(s.idleTimeLimit) localStorage.setItem('mstock_idleTimeLimit', s.idleTimeLimit);
+                        if(s.autoBackupInterval) localStorage.setItem('mstock_autoBackup', s.autoBackupInterval);
+                        if(s.shopName) localStorage.setItem('mstock_shopName', s.shopName);
+                        if(s.shopPhone) localStorage.setItem('mstock_shopPhone', s.shopPhone);
+                        if(s.vfCash) localStorage.setItem('mstock_vfCash', s.vfCash);
+                    }
+
                     if(heavyData.stockProducts) stockProducts = heavyData.stockProducts;
                     if(heavyData.merchantsList) merchantsList = heavyData.merchantsList;
                     if(heavyData.merchantTransactions) merchantTransactions = heavyData.merchantTransactions;
+                    if(heavyData.creditorsList) creditorsList = heavyData.creditorsList;
+                    if(heavyData.creditorTransactions) creditorTransactions = heavyData.creditorTransactions;
                     if(heavyData.invoiceRegistry) invoiceRegistry = heavyData.invoiceRegistry;
                     if(heavyData.invoiceArchive) invoiceArchive = heavyData.invoiceArchive;
                     if(heavyData.tasfeyaRegistry) tasfeyaRegistry = heavyData.tasfeyaRegistry;
@@ -2145,9 +2834,13 @@
                     const ir = localStorage.getItem('mstock_invoiceRegistry');
                     const ia = localStorage.getItem('mstock_invoiceArchive');
                     const tr = localStorage.getItem('mstock_tasfeyaRegistry');
+                    const cl = localStorage.getItem('mstock_creditorsList');
+                    const ct = localStorage.getItem('mstock_creditorTransactions');
                     if(sp) stockProducts = JSON.parse(sp);
                     if(ml) merchantsList = JSON.parse(ml);
                     if(mt) merchantTransactions = JSON.parse(mt);
+                    if(cl) creditorsList = JSON.parse(cl);
+                    if(ct) creditorTransactions = JSON.parse(ct);
                     if(ir) invoiceRegistry = JSON.parse(ir);
                     if(ia) invoiceArchive = JSON.parse(ia);
                     if(tr) tasfeyaRegistry = JSON.parse(tr);
@@ -2732,7 +3425,7 @@
             // load persisted data first
             loadAppState();
             applyStoredSettings();
-            renderStockTable(); renderInvoiceTables(); renderMerchantsTable(); renderTxTable(); renderVfCashInputs(); updatePinControls(); calculateFinancialReports();
+            renderStockTable(); renderInvoiceTables(); renderMerchantsTable(); renderTxTable(); renderCreditorsTable(); renderCreditTxTable(); renderVfCashInputs(); updatePinControls(); calculateFinancialReports();
 
             // Show activation screen or login depending on Supabase HWID License file
             checkLicenseOnStartup();
@@ -2795,6 +3488,7 @@
             if(pageId === 'cashier-page') document.getElementById('menu-cashier').classList.add('active');
             if(pageId === 'stock-page') document.getElementById('menu-stock').classList.add('active');
             if(pageId === 'merchants-page') document.getElementById('menu-merchants').classList.add('active');
+            if(pageId === 'creditors-page') document.getElementById('menu-creditors').classList.add('active');
             if(pageId === 'tasfeya-log-page') {
                 document.getElementById('menu-tasfeya').classList.add('active');
                 renderTasfeyaLog();
@@ -2846,24 +3540,36 @@
                     const costPrice = typeof item.costPrice === 'number' ? item.costPrice : 0;
                     invProfit += ((item.price - costPrice) * item.qty);
                 });
-                profitTotal += invProfit;
+                profitTotal += (invProfit - (inv.discount || 0));
 
                 const change = Math.max(0, (parseFloat(inv.paymentAmount) || 0) - inv.total);
                 cashTotal += (parseFloat(inv.cashAmount) || 0) - change;
                 vfTotal += parseFloat(inv.vfAmount) || 0;
             });
 
-            // Carry over the base money from the last tasfeya
-            let lastActualCash = 0;
-            let lastActualVf = 0;
-            if (tasfeyaRegistry.length > 0) {
-                const last = tasfeyaRegistry[tasfeyaRegistry.length - 1];
-                lastActualCash = parseFloat(last.actualCash) || 0;
-                lastActualVf = parseFloat(last.actualVf) || 0;
-            }
+            // إضافة تحصيلات ومبيعات وأرباح الشكك لنفس الشيفت
+            const lastTasfeyaTime = tasfeyaRegistry.length > 0 ? new Date(tasfeyaRegistry[tasfeyaRegistry.length - 1].timestamp) : new Date(0);
+            const newCreditorTx = creditorTransactions.filter(tx => new Date(tx.timestamp) > lastTasfeyaTime);
+            
+            newCreditorTx.forEach(tx => {
+                if(tx.type.includes('تحصيل')) {
+                    cashTotal += tx.amount; // الدفعات اللي تم تحصيلها بتخش الدرج
+                    salesTotal += (tx.salesPart || 0);
+                    profitTotal += (tx.profitPart || 0);
+                }
+            });
 
-            const calcCash = lastActualCash + cashTotal;
-            const calcVf = lastActualVf + vfTotal;
+            // إضافة خصومات التجار (التحصيلات المدفوعة للموردين تخرج من الدرج)
+            const newMerchantTx = merchantTransactions.filter(tx => new Date(tx.timestamp) > lastTasfeyaTime);
+            newMerchantTx.forEach(tx => {
+                if(tx.type === "تحصيل") {
+                    cashTotal -= tx.amount;
+                }
+            });
+
+            // كاش الدرج يبدأ من الصفر بعد كل تصفية (تم إزالة الترحيل)
+            const calcCash = cashTotal;
+            const calcVf = vfTotal;
 
             currentTasfeyaData = {
                 salesTotal,
@@ -2931,9 +3637,10 @@
             const newInvoices = getInvoicesSinceLastTasfeya();
             const lastTasfeyaTime = tasfeyaRegistry.length > 0 ? new Date(tasfeyaRegistry[tasfeyaRegistry.length - 1].timestamp) : new Date(0);
             const newMerchantTx = merchantTransactions.filter(tx => new Date(tx.timestamp) > lastTasfeyaTime);
+            const newCreditorTx = creditorTransactions.filter(tx => new Date(tx.timestamp) > lastTasfeyaTime);
 
-            // الربح الصافي = ربح المنتجات - المصروفات، والحد الأدنى صفر (ما يكونش سالب)
-            const netProfit = Math.max(0, currentTasfeyaData.profitTotal - expenses);
+            // الربح الصافي = ربح المنتجات - المصروفات (يمكن أن يكون بالسالب في حالة الخسارة)
+            const netProfit = currentTasfeyaData.profitTotal - expenses;
 
             const record = {
                 id: Date.now(),
@@ -2948,7 +3655,8 @@
                 notes: notes,
                 autoClosed: autoClose,
                 invoices: newInvoices,
-                merchantTransactions: newMerchantTx
+                merchantTransactions: newMerchantTx,
+                creditorTransactions: newCreditorTx
             };
 
             tasfeyaRegistry.push(record);
@@ -2958,6 +3666,8 @@
             invoiceArchive = invoiceArchive.filter(inv => !newInvoices.find(i => i.id === inv.id));
             // مسح حركات التجار من السجل الحي بعد التصفية
             merchantTransactions = merchantTransactions.filter(tx => !newMerchantTx.find(t => t.id === tx.id));
+            // مسح حركات الشكك من السجل الحي بعد التصفية
+            creditorTransactions = creditorTransactions.filter(tx => !newCreditorTx.find(t => t.id === tx.id));
 
             saveAppState();
             closeTasfeyaModal();
@@ -2993,24 +3703,34 @@
                     const costPrice = typeof item.costPrice === 'number' ? item.costPrice : 0;
                     invProfit += ((item.price - costPrice) * item.qty);
                 });
-                profitTotal += invProfit;
+                profitTotal += (invProfit - (inv.discount || 0));
                 const change = Math.max(0, (parseFloat(inv.paymentAmount) || 0) - inv.total);
                 cashTotal += (parseFloat(inv.cashAmount) || 0) - change;
                 vfTotal += parseFloat(inv.vfAmount) || 0;
             });
 
-            let lastActualCash = 0, lastActualVf = 0;
-            if (tasfeyaRegistry.length > 0) {
-                const last = tasfeyaRegistry[tasfeyaRegistry.length - 1];
-                lastActualCash = parseFloat(last.actualCash) || 0;
-                lastActualVf = parseFloat(last.actualVf) || 0;
-            }
+            const lastTasfeyaTime = tasfeyaRegistry.length > 0 ? new Date(tasfeyaRegistry[tasfeyaRegistry.length - 1].timestamp) : new Date(0);
+            const newCreditorTx = creditorTransactions.filter(tx => new Date(tx.timestamp) > lastTasfeyaTime);
+            newCreditorTx.forEach(tx => {
+                if(tx.type.includes('تحصيل')) {
+                    cashTotal += tx.amount;
+                    salesTotal += (tx.salesPart || 0);
+                    profitTotal += (tx.profitPart || 0);
+                }
+            });
+
+            const newMerchantTx = merchantTransactions.filter(tx => new Date(tx.timestamp) > lastTasfeyaTime);
+            newMerchantTx.forEach(tx => {
+                if(tx.type === "تحصيل") {
+                    cashTotal -= tx.amount;
+                }
+            });
 
             currentTasfeyaData = {
                 salesTotal,
                 profitTotal,
-                calcCash: lastActualCash + cashTotal,
-                calcVf: lastActualVf + vfTotal
+                calcCash: cashTotal,
+                calcVf: vfTotal
             };
 
             document.getElementById('recovery-modal').style.display = 'none';
@@ -3098,6 +3818,63 @@
         }
 
         // --- Data Management & Updates ---
+        function saveOpeningBalanceMerchant() {
+            const name = document.getElementById('ob-merchant-name').value.trim();
+            const phone = document.getElementById('ob-merchant-phone').value.trim();
+            const debt = parseFloat(document.getElementById('ob-merchant-debt').value) || 0;
+            const note = document.getElementById('ob-merchant-note').value.trim() || 'رصيد افتتاحي';
+            if(!name || debt < 0) { showToast("برجاء إدخال اسم التاجر وقيمة صحيحة", "error"); return; }
+            let mId = Date.now();
+            merchantsList.push({ id: mId, name: name, phone: phone, debt: debt, note: note, active: true });
+            if (debt > 0) {
+                merchantTransactions.push({
+                    id: Date.now() + 1, merchantId: mId, merchantName: name,
+                    type: "رصيد افتتاحي", amount: debt, date: new Date().toISOString().split('T')[0], timestamp: new Date().toISOString()
+                });
+            }
+            saveAppState();
+            renderMerchantsTable();
+            document.getElementById('opening-balance-merchant-modal').style.display='none';
+            document.getElementById('ob-merchant-name').value = '';
+            document.getElementById('ob-merchant-phone').value = '';
+            document.getElementById('ob-merchant-debt').value = '';
+            document.getElementById('ob-merchant-note').value = '';
+            showToast("تم تسجيل الرصيد الافتتاحي للتاجر بنجاح", "success");
+        }
+
+        function saveOpeningBalanceCreditor() {
+            const name = document.getElementById('ob-creditor-name').value.trim();
+            const phone = document.getElementById('ob-creditor-phone').value.trim();
+            const debt = parseFloat(document.getElementById('ob-creditor-debt').value) || 0;
+            const note = document.getElementById('ob-creditor-note').value.trim() || 'رصيد افتتاحي';
+            if(!name || debt < 0) { showToast("برجاء إدخال اسم العميل وقيمة صحيحة", "error"); return; }
+            let mId = Date.now();
+            creditorsList.push({ id: mId, name: name, phone: phone, debt: debt, note: note, unpaidCost: 0, active: true });
+            if (debt > 0) {
+                creditorTransactions.push({
+                    id: Date.now() + 1, creditorId: mId, creditorName: name,
+                    type: "رصيد افتتاحي", amount: debt, timestamp: new Date().toISOString(), archived: false
+                });
+            }
+            saveAppState();
+            renderCreditorsTable();
+            document.getElementById('opening-balance-creditor-modal').style.display='none';
+            document.getElementById('ob-creditor-name').value = '';
+            document.getElementById('ob-creditor-phone').value = '';
+            document.getElementById('ob-creditor-debt').value = '';
+            document.getElementById('ob-creditor-note').value = '';
+            showToast("تم تسجيل الرصيد الافتتاحي للعميل بنجاح", "success");
+        }
+
+        function deleteAllTasfeyaLog() {
+            openGenericConfirmModal("حذف سجل التصفية", "هل أنت متأكد من حذف سجل التصفيات بالكامل؟", function() {
+                tasfeyaRegistry = [];
+                saveAppState();
+                if(typeof renderTasfeyaLog === 'function') renderTasfeyaLog();
+                showToast('تم حذف سجل التصفيات بالكامل', 'success');
+            });
+        }
+
         function deleteAllMerchantLog() {
             openGenericConfirmModal("حذف سجلات التجار", "هل أنت متأكد من حذف سجل حركة التجار بالكامل؟ سيتم حذف جميع التحصيلات والإضافات التاريخية، ولن تتأثر المديونيات الحالية للتجار.", function() {
                 merchantTransactions = [];
@@ -3129,35 +3906,40 @@
             btn.disabled = true;
 
             const { ipcRenderer } = require('electron');
-            ipcRenderer.invoke('check-for-updates').then(result => {
-                if(result && result.updateInfo) {
+            ipcRenderer.invoke('get-app-version').then(appVersion => {
+                ipcRenderer.invoke('check-for-updates').then(result => {
+                    if(result && result.updateInfo && result.updateInfo.version !== appVersion) {
+                        btn.classList.remove('btn-success');
+                        btn.classList.add('btn-secondary');
+                        btn.innerText = 'يوجد تحديث، جاري التحميل...';
+                        document.getElementById('update-progress-container').style.display = 'block';
+                    } else {
+                        btn.classList.remove('btn-success');
+                        btn.classList.add('btn-secondary');
+                        btn.innerText = 'أنت على أحدث إصدار v' + appVersion;
+                        
+                        setTimeout(() => {
+                            btn.classList.remove('btn-secondary');
+                            btn.classList.add('btn-success');
+                            btn.innerText = originalText;
+                            btn.disabled = false;
+                            document.getElementById('update-progress-container').style.display = 'none';
+                        }, 5000);
+                    }
+                }).catch(err => {
                     btn.classList.remove('btn-success');
                     btn.classList.add('btn-secondary');
-                    btn.innerText = 'يوجد تحديث، جاري التحميل...';
-                } else {
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-secondary');
-                    btn.innerText = 'هذا اخر اصدار';
-                    
+                    btn.innerText = 'فشل البحث عن تحديثات';
                     setTimeout(() => {
                         btn.classList.remove('btn-secondary');
                         btn.classList.add('btn-success');
                         btn.innerText = originalText;
                         btn.disabled = false;
                     }, 5000);
-                }
-            }).catch(err => {
-                btn.classList.remove('btn-success');
-                btn.classList.add('btn-secondary');
-                btn.innerText = 'فشل البحث عن تحديثات';
-                setTimeout(() => {
-                    btn.classList.remove('btn-secondary');
-                    btn.classList.add('btn-success');
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                }, 5000);
+                });
             });
         }
+
 
         function viewTasfeyaDetails(id) {
             const tasfeya = tasfeyaRegistry.find(t => t.id === id);
@@ -3219,10 +4001,51 @@
                     </tr>`;
                 });
                 merchHtml += '</table>';
-            } else {
                 merchHtml = '<p style="text-align:center; padding: 20px;">لا توجد حركات تجار في هذه التصفية</p>';
             }
             document.getElementById('tasfeya-view-merchants-content').innerHTML = merchHtml;
+
+            let credHtml = '';
+            const credTxs = tasfeya.creditorTransactions || [];
+            if(credTxs.length > 0) {
+                const thStyle = 'border:1px solid #cbd5e1; padding:10px; background:#f8fafc; font-weight:bold;';
+                const tdStyle = 'border:1px solid #cbd5e1; padding:10px;';
+                credHtml = `<table style="width:100%; border-collapse:collapse; margin-top:10px;">
+                    <tr>
+                        <th style="${thStyle}">العميل</th>
+                        <th style="${thStyle}">التاريخ والوقت</th>
+                        <th style="${thStyle}">نوع العملية</th>
+                        <th style="${thStyle}">المبلغ</th>
+                    </tr>`;
+                credTxs.forEach(tx => {
+                    const dt = new Date(tx.timestamp);
+                    const txDateStr = dt.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+                    const txTimeStr = dt.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                    const typeStr = tx.type || 'غير محدد';
+                    const isCollection = typeStr.includes('تحصيل');
+                    
+                    let badge = '';
+                    let color = '#333';
+                    if(isCollection) {
+                        badge = `<span style="background:#10b981; color:#fff; padding:2px 8px; border-radius:12px; font-size:12px;">${typeStr}</span>`;
+                        color = '#047857';
+                    } else {
+                        badge = `<span style="background:#f59e0b; color:#fff; padding:2px 8px; border-radius:12px; font-size:12px;">${typeStr}</span>`;
+                        color = '#b45309';
+                    }
+
+                    credHtml += `<tr>
+                        <td style="${tdStyle}; font-weight:bold;">${escapeHTML(tx.creditorName || 'غير معروف')}</td>
+                        <td style="${tdStyle}">${txDateStr} ، ${txTimeStr}</td>
+                        <td style="${tdStyle}">${badge}</td>
+                        <td style="${tdStyle}; font-weight:bold; color:${color};">${tx.amount} ج.م</td>
+                    </tr>`;
+                });
+                credHtml += '</table>';
+            } else {
+                credHtml = '<p style="text-align:center; padding: 20px;">لا توجد حركات شكك في هذه التصفية</p>';
+            }
+            document.getElementById('tasfeya-view-creditors-content').innerHTML = credHtml;
 
             switchTasfeyaTab('invoices');
             document.getElementById('tasfeya-view-modal').style.display = 'flex';
@@ -3235,19 +4058,27 @@
         function switchTasfeyaTab(tab) {
             document.getElementById('tasfeya-view-invoices-content').style.display = 'none';
             document.getElementById('tasfeya-view-merchants-content').style.display = 'none';
+            document.getElementById('tasfeya-view-creditors-content').style.display = 'none';
+            
+            document.getElementById('tasfeya-tab-invoices').style.background = '#e2e8f0';
+            document.getElementById('tasfeya-tab-invoices').style.color = '#334155';
+            document.getElementById('tasfeya-tab-merchants').style.background = '#e2e8f0';
+            document.getElementById('tasfeya-tab-merchants').style.color = '#334155';
+            document.getElementById('tasfeya-tab-creditors').style.background = '#e2e8f0';
+            document.getElementById('tasfeya-tab-creditors').style.color = '#334155';
             
             if(tab === 'invoices') {
                 document.getElementById('tasfeya-tab-invoices').style.background = 'var(--primary-color)';
                 document.getElementById('tasfeya-tab-invoices').style.color = '#fff';
-                document.getElementById('tasfeya-tab-merchants').style.background = '#e2e8f0';
-                document.getElementById('tasfeya-tab-merchants').style.color = '#333';
                 document.getElementById('tasfeya-view-invoices-content').style.display = 'block';
-            } else {
+            } else if (tab === 'merchants') {
                 document.getElementById('tasfeya-tab-merchants').style.background = 'var(--primary-color)';
                 document.getElementById('tasfeya-tab-merchants').style.color = '#fff';
-                document.getElementById('tasfeya-tab-invoices').style.background = '#e2e8f0';
-                document.getElementById('tasfeya-tab-invoices').style.color = '#333';
                 document.getElementById('tasfeya-view-merchants-content').style.display = 'block';
+            } else if (tab === 'creditors') {
+                document.getElementById('tasfeya-tab-creditors').style.background = 'var(--primary-color)';
+                document.getElementById('tasfeya-tab-creditors').style.color = '#fff';
+                document.getElementById('tasfeya-view-creditors-content').style.display = 'block';
             }
         }
 
@@ -3265,18 +4096,28 @@
                 switch(data.type) {
                     case 'downloading':
                         showToast(`⬇️ ${data.message}`, 'info');
+                        document.getElementById('update-progress-container').style.display = 'block';
                         break;
                     case 'progress':
-                        // تحديث بار التقدم كل 10%
-                        if (data.percent % 10 === 0) {
-                            showToast(`⬇️ ${data.message}`, 'info');
+                        document.getElementById('update-progress-container').style.display = 'block';
+                        const pBar = document.getElementById('update-progress-bar');
+                        const pText = document.getElementById('update-progress-text');
+                        const pSize = document.getElementById('update-progress-size');
+                        if(pBar) pBar.style.width = data.percent + '%';
+                        if(pText) pText.innerText = `جاري التحميل: ${data.percent}%`;
+                        if(data.total && data.transferred && pSize) {
+                            const mbTotal = (data.total / (1024 * 1024)).toFixed(1);
+                            const mbTrans = (data.transferred / (1024 * 1024)).toFixed(1);
+                            pSize.innerText = `${mbTrans} MB / ${mbTotal} MB`;
                         }
                         break;
                     case 'ready':
                         showToast(`✅ تم تحميل التحديث v${data.version} - سيظهر مربع الاختيار قريباً`, 'success');
+                        document.getElementById('update-progress-container').style.display = 'none';
                         break;
                     case 'postponed':
                         showToast(`⏳ ${data.message}`, 'info');
+                        document.getElementById('update-progress-container').style.display = 'none';
                         break;
                     case 'error':
                         showToast(`❌ ${data.message}`, 'error');
@@ -3287,6 +4128,257 @@
             // Not in Electron context (dev mode)
         }
 
+        // ===== نظام التفصيل =====
+        let tailoringRegistry = [];
+        try {
+            const stored = localStorage.getItem('mstock_tailoringRegistry');
+            if(stored) tailoringRegistry = JSON.parse(stored);
+        } catch(e) { console.error('tailoring parsing error', e); }
+        
+        let activeViewTailoring = null;
+
+        function openTailoringModal() {
+            document.getElementById('tailoring-modal').style.display = 'flex';
+            switchTailoringTab(null, 'new-tailoring-tab');
+            clearTailoringForm();
+        }
+        function closeTailoringModal() {
+            document.getElementById('tailoring-modal').style.display = 'none';
+        }
+
+        function switchTailoringTab(event, tabId) {
+            const modal = document.getElementById('tailoring-modal');
+            const links = modal.querySelectorAll('.tab-link');
+            const contents = modal.querySelectorAll('.tab-content');
+            
+            links.forEach(l => l.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            
+            if(event) {
+                event.currentTarget.classList.add('active');
+            } else {
+                const targetLink = Array.from(links).find(l => l.getAttribute('onclick') && l.getAttribute('onclick').includes(tabId));
+                if(targetLink) targetLink.classList.add('active');
+                else modal.querySelector('.tab-link').classList.add('active');
+            }
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            if(tabId === 'tailoring-history-tab') {
+                renderTailoringHistory(document.getElementById('tailoring-search-input').value);
+            }
+        }
+
+        function calculateTailoringRemaining() {
+            const total = parseFloat(document.getElementById('tailoring-total').value) || 0;
+            const paid = parseFloat(document.getElementById('tailoring-paid').value) || 0;
+            document.getElementById('tailoring-remaining').value = Math.max(0, total - paid);
+        }
+        
+        function clearTailoringForm() {
+            ['name', 'tqam', 'yaqa', 'katf', 'kom', 'sadr', 'tool', 'fatha', 'serwal', 'total', 'paid', 'remaining', 'notes'].forEach(id => {
+                const el = document.getElementById('tailoring-' + id);
+                if (el) el.value = '';
+            });
+        }
+
+        function saveNewTailoring() {
+            const name = document.getElementById('tailoring-name').value.trim();
+            if(!name) { showToast('يرجى إدخال اسم العميل', 'error'); return; }
+            
+            const total = parseFloat(document.getElementById('tailoring-total').value) || 0;
+            const paid = parseFloat(document.getElementById('tailoring-paid').value) || 0;
+            const remaining = parseFloat(document.getElementById('tailoring-remaining').value) || 0;
+            
+            const record = {
+                id: Date.now(),
+                name: name,
+                date: new Date().toLocaleString('ar-EG'),
+                measurements: {
+                    tqam: document.getElementById('tailoring-tqam').value,
+                    yaqa: document.getElementById('tailoring-yaqa').value,
+                    katf: document.getElementById('tailoring-katf').value,
+                    kom: document.getElementById('tailoring-kom').value,
+                    sadr: document.getElementById('tailoring-sadr').value,
+                    tool: document.getElementById('tailoring-tool').value,
+                    fatha: document.getElementById('tailoring-fatha').value,
+                    serwal: document.getElementById('tailoring-serwal').value
+                },
+                financials: { total, paid, remaining },
+                notes: document.getElementById('tailoring-notes').value
+            };
+            
+            tailoringRegistry.push(record);
+            localStorage.setItem('mstock_tailoringRegistry', JSON.stringify(tailoringRegistry));
+            showToast('تم حفظ طلب التفصيل بنجاح', 'success');
+            clearTailoringForm();
+            switchTailoringTab(null, 'tailoring-history-tab');
+        }
+
+        function renderTailoringHistory(searchTerm = '') {
+            const tbody = document.getElementById('tailoring-history-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            
+            const filtered = tailoringRegistry.filter(r => r.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            
+            filtered.sort((a,b) => b.id - a.id).forEach(r => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.name}</td>
+                        <td>${r.date.split(',')[0]}</td>
+                        <td>${r.financials.total} ج.م</td>
+                        <td>${r.financials.remaining} ج.م</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="viewTailoringDetails(${r.id})">عرض</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteTailoring(${r.id})">حذف</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteTailoring(id) {
+            if(confirm('هل أنت متأكد من حذف هذا الطلب؟')) {
+                tailoringRegistry = tailoringRegistry.filter(r => r.id !== id);
+                localStorage.setItem('mstock_tailoringRegistry', JSON.stringify(tailoringRegistry));
+                renderTailoringHistory(document.getElementById('tailoring-search-input').value);
+                showToast('تم الحذف بنجاح', 'success');
+            }
+        }
+
+        function viewTailoringDetails(id) {
+            const record = tailoringRegistry.find(r => r.id === id);
+            if(!record) return;
+            activeViewTailoring = record;
+            
+            let html = `
+                <table style="width:100%; border-collapse:collapse; margin-bottom:15px; text-align: right;">
+                    <tr><td style="padding:8px; border:1px solid #cbd5e1; font-weight:bold; width: 30%;">الاسم</td><td style="padding:8px; border:1px solid #cbd5e1;">${record.name}</td></tr>
+                    <tr><td style="padding:8px; border:1px solid #cbd5e1; font-weight:bold;">التاريخ</td><td style="padding:8px; border:1px solid #cbd5e1;">${record.date}</td></tr>
+                    <tr><td style="padding:8px; border:1px solid #cbd5e1; font-weight:bold;">المبلغ الإجمالي</td><td style="padding:8px; border:1px solid #cbd5e1;">${record.financials.total} ج.م</td></tr>
+                    <tr><td style="padding:8px; border:1px solid #cbd5e1; font-weight:bold;">المدفوع</td><td style="padding:8px; border:1px solid #cbd5e1;">${record.financials.paid} ج.م</td></tr>
+                    <tr><td style="padding:8px; border:1px solid #cbd5e1; font-weight:bold;">المتبقي</td><td style="padding:8px; border:1px solid #cbd5e1;">${record.financials.remaining} ج.م</td></tr>
+                </table>
+                <h4 style="margin-bottom:8px;">المقاسات:</h4>
+                <table style="width:100%; border-collapse:collapse; margin-bottom:15px; text-align:center;">
+                    <tr style="background:#f1f5f9; font-weight:bold;">
+                        <td style="padding:8px; border:1px solid #cbd5e1; width:25%;">طقم</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1; width:25%;">ياقة</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1; width:25%;">كتف</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1; width:25%;">كم</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">${record.measurements.tqam}</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">${record.measurements.yaqa}</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">${record.measurements.katf}</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">${record.measurements.kom}</td>
+                    </tr>
+                    <tr style="background:#f1f5f9; font-weight:bold;">
+                        <td style="padding:8px; border:1px solid #cbd5e1;">صدر</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">طول</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">فتحة</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">سروال</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">${record.measurements.sadr}</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">${record.measurements.tool}</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">${record.measurements.fatha}</td>
+                        <td style="padding:8px; border:1px solid #cbd5e1;">${record.measurements.serwal}</td>
+                    </tr>
+                </table>
+                <p><strong>ملاحظات:</strong> ${record.notes}</p>
+            `;
+            
+            document.getElementById('view-tailoring-details-content').innerHTML = html;
+            document.getElementById('view-tailoring-modal').style.display = 'flex';
+        }
+        function closeViewTailoringModal() {
+            document.getElementById('view-tailoring-modal').style.display = 'none';
+        }
+        
+        function printTailoringAsPDF() {
+            const record = activeViewTailoring;
+            if(!record) return;
+            const printWindow = window.open('', '_blank');
+            if(!printWindow) { showToast('يرجى السماح بفتح نافذة الطباعة', 'error'); return; }
+            
+            const html = `<!DOCTYPE html>
+            <html lang="ar" dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>طلب تفصيل - ${record.name}</title>
+                <style>
+                    body { font-family: 'Tahoma', sans-serif; direction: rtl; text-align: right; padding: 20px; background: white; color: black; }
+                    .header-box { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+                    h2 { margin: 0 0 5px 0; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: center; }
+                    th, td { border: 1px solid #000; padding: 10px; font-size: 16px; }
+                    th { background-color: #f1f5f9; font-weight: bold; }
+                    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; font-size: 16px; }
+                    .info-item { border: 1px solid #000; padding: 10px; }
+                </style>
+            </head>
+            <body>
+                <div class="header-box">
+                    <h2>طلب تفصيل عميل</h2>
+                    <p>التاريخ: ${record.date}</p>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item"><strong>الاسم:</strong> ${record.name}</div>
+                    <div class="info-item"><strong>المبلغ الإجمالي:</strong> ${record.financials.total} ج.م</div>
+                    <div class="info-item"><strong>المدفوع:</strong> ${record.financials.paid} ج.م</div>
+                    <div class="info-item"><strong>المتبقي:</strong> ${record.financials.remaining} ج.م</div>
+                </div>
+                
+                <h3 style="margin-top:20px;">المقاسات والتفاصيل:</h3>
+                <table>
+                    <tr>
+                        <th style="width:25%;">طقم</th>
+                        <th style="width:25%;">ياقة</th>
+                        <th style="width:25%;">كتف</th>
+                        <th style="width:25%;">كم</th>
+                    </tr>
+                    <tr>
+                        <td>${record.measurements.tqam}</td>
+                        <td>${record.measurements.yaqa}</td>
+                        <td>${record.measurements.katf}</td>
+                        <td>${record.measurements.kom}</td>
+                    </tr>
+                    <tr>
+                        <th>صدر</th>
+                        <th>طول</th>
+                        <th>فتحة</th>
+                        <th>سروال</th>
+                    </tr>
+                    <tr>
+                        <td>${record.measurements.sadr}</td>
+                        <td>${record.measurements.tool}</td>
+                        <td>${record.measurements.fatha}</td>
+                        <td>${record.measurements.serwal}</td>
+                    </tr>
+                </table>
+                
+                <div style="margin-top:20px; padding: 15px; border: 1px dashed #000; min-height: 50px;">
+                    <strong>ملاحظات:</strong> ${record.notes}
+                </div>
+                
+                <div style="margin-top: 40px; text-align: center; font-size: 14px;">
+                    <p>Mstock POS &copy; ${new Date().getFullYear()}</p>
+                </div>
+            </body>
+            </html>`;
+            
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 250);
+        }
     </script>
 
     <!-- Tasfeya View Modal - fixed overlay on top of everything -->
@@ -3308,11 +4400,152 @@
                     onclick="switchTasfeyaTab('merchants')">
                     🤝 حركات التجار
                 </button>
+                <button id="tasfeya-tab-creditors"
+                    style="flex:1; padding:11px; border-radius:8px; border:none; font-size:15px; font-weight:bold; cursor:pointer; transition:all 0.2s; background:#e2e8f0; color:#334155;"
+                    onclick="switchTasfeyaTab('creditors')">
+                    📝 حركات الشكك
+                </button>
             </div>
             <!-- Tab contents -->
             <div id="tasfeya-view-invoices-content" style="max-height: 430px; overflow-y: auto;"></div>
             <div id="tasfeya-view-merchants-content" style="max-height: 430px; overflow-y: auto; display:none;"></div>
+            <div id="tasfeya-view-creditors-content" style="max-height: 430px; overflow-y: auto; display:none;"></div>
         </div>
     </div>
+    <!-- Tailoring Modals -->
+    <div id="tailoring-modal" class="modal-overlay">
+        <div class="modal-box" style="width: 750px;">
+            <div class="tabs-header">
+                <button class="tab-link active" onclick="switchTailoringTab(event, 'new-tailoring-tab')">تفصيل جديد</button>
+                <button class="tab-link" onclick="switchTailoringTab(event, 'tailoring-history-tab')">سجل التفصيل</button>
+            </div>
+            
+            <div id="new-tailoring-tab" class="tab-content active">
+                <div style="display: flex; gap: 10px;">
+                    <div class="form-control" style="flex: 1;">
+                        <label>الاسم</label>
+                        <input type="text" id="tailoring-name" placeholder="اسم العميل...">
+                    </div>
+                </div>
+                
+                <h4 style="margin: 10px 0 10px 0;">المقاسات</h4>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); row-gap: 18px; column-gap: 10px; margin-bottom: 15px;">
+                    <div class="form-control" style="margin: 0;"><label>طقم</label><input type="text" id="tailoring-tqam"></div>
+                    <div class="form-control" style="margin: 0;"><label>ياقة</label><input type="text" id="tailoring-yaqa"></div>
+                    <div class="form-control" style="margin: 0;"><label>كتف</label><input type="text" id="tailoring-katf"></div>
+                    <div class="form-control" style="margin: 0;"><label>كم</label><input type="text" id="tailoring-kom"></div>
+                    <div class="form-control" style="margin: 0;"><label>صدر</label><input type="text" id="tailoring-sadr"></div>
+                    <div class="form-control" style="margin: 0;"><label>طول</label><input type="text" id="tailoring-tool"></div>
+                    <div class="form-control" style="margin: 0;"><label>فتحة</label><input type="text" id="tailoring-fatha"></div>
+                    <div class="form-control" style="margin: 0;"><label>سروال</label><input type="text" id="tailoring-serwal"></div>
+                </div>
+                
+                <h4 style="margin: 15px 0 10px 0;">الماليات وملاحظات</h4>
+                <div style="display: flex; gap: 10px;">
+                    <div class="form-control" style="flex: 1;"><label>المبلغ</label><input type="number" id="tailoring-total" oninput="calculateTailoringRemaining()"></div>
+                    <div class="form-control" style="flex: 1;"><label>المدفوع</label><input type="number" id="tailoring-paid" oninput="calculateTailoringRemaining()"></div>
+                    <div class="form-control" style="flex: 1;"><label>المتبقي</label><input type="number" id="tailoring-remaining" readonly style="background-color:#f1f5f9;"></div>
+                </div>
+                
+                <div class="form-control">
+                    <label>ملاحظات</label>
+                    <input type="text" id="tailoring-notes" placeholder="ملاحظات إضافية...">
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-danger" onclick="closeTailoringModal()">إلغاء</button>
+                    <button class="btn btn-success" onclick="saveNewTailoring()">حفظ</button>
+                </div>
+            </div>
+            
+            <div id="tailoring-history-tab" class="tab-content">
+                <div class="stock-controls">
+                    <input type="text" id="tailoring-search-input" class="search-bar" placeholder="بحث باسم العميل..." oninput="renderTailoringHistory(this.value)">
+                </div>
+                <div class="table-container-wrapper" style="max-height: 300px; overflow-y: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>التاريخ</th>
+                                <th>المبلغ</th>
+                                <th>المتبقي</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tailoring-history-table-body"></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer" style="justify-content: flex-end;">
+                    <button class="btn btn-danger" onclick="closeTailoringModal()">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="view-tailoring-modal" class="modal-overlay" style="z-index: 10001;">
+        <div class="modal-box" style="width: 600px;">
+            <h3 style="text-align: center;">تفاصيل التفصيل</h3>
+            <div id="view-tailoring-details-content" style="font-size: 15px; line-height: 1.6; margin-bottom: 20px;"></div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="closeViewTailoringModal()">إغلاق</button>
+                <button class="btn btn-warning" style="color: white;" onclick="printTailoringAsPDF()">طباعة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Opening Balance Modals -->
+    <div class="modal" id="opening-balance-merchant-modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <h2 style="margin-top:0;">إضافة رصيد افتتاحي (تاجر / مورد)</h2>
+            <div class="form-control">
+                <label>اسم التاجر</label>
+                <input type="text" id="ob-merchant-name" placeholder="أدخل اسم التاجر">
+            </div>
+            <div class="form-control">
+                <label>رقم الهاتف</label>
+                <input type="text" id="ob-merchant-phone" placeholder="أدخل رقم التاجر">
+            </div>
+            <div class="form-control">
+                <label>رصيد افتتاحي (مبلغ المديونية لك)</label>
+                <input type="number" id="ob-merchant-debt" placeholder="المبلغ" min="0">
+            </div>
+            <div class="form-control">
+                <label>ملاحظات إضافية (اختياري)</label>
+                <input type="text" id="ob-merchant-note" placeholder="أي ملحوظة عن هذا الرصيد">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-success" style="flex: 1;" onclick="saveOpeningBalanceMerchant()">حفظ</button>
+                <button class="btn btn-secondary" style="flex: 1;" onclick="document.getElementById('opening-balance-merchant-modal').style.display='none'">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="opening-balance-creditor-modal">
+        <div class="modal-content" style="max-width: 450px;">
+            <h2 style="margin-top:0;">إضافة رصيد افتتاحي (عميل شكك)</h2>
+            <div class="form-control">
+                <label>اسم العميل</label>
+                <input type="text" id="ob-creditor-name" placeholder="أدخل اسم العميل">
+            </div>
+            <div class="form-control">
+                <label>رقم الهاتف</label>
+                <input type="text" id="ob-creditor-phone" placeholder="أدخل رقم العميل">
+            </div>
+            <div class="form-control">
+                <label>رصيد افتتاحي (مبلغ المديونية عليه)</label>
+                <input type="number" id="ob-creditor-debt" placeholder="المبلغ" min="0">
+            </div>
+            <div class="form-control">
+                <label>ملاحظات إضافية (اختياري)</label>
+                <input type="text" id="ob-creditor-note" placeholder="أي ملحوظة عن هذا الرصيد">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-success" style="flex: 1;" onclick="saveOpeningBalanceCreditor()">حفظ</button>
+                <button class="btn btn-secondary" style="flex: 1;" onclick="document.getElementById('opening-balance-creditor-modal').style.display='none'">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
