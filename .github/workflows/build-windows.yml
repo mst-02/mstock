@@ -24,6 +24,13 @@ jobs:
       - name: Convert PNG to ICO
         run: node scripts/convert-icon.js
 
+      - name: Get version from package.json
+        id: version
+        run: |
+          $ver = (Get-Content package.json | ConvertFrom-Json).version
+          echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
+          echo "Version: $ver"
+
       - name: Build and Publish Windows installer
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,3 +41,18 @@ jobs:
         with:
           name: mstock-installer
           path: dist/**
+
+      - name: Create GitHub Release (fallback)
+        if: always()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.VERSION }}
+          name: Mstock v${{ steps.version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          files: |
+            dist/*.exe
+            dist/*.yml
+            dist/*.blockmap
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
