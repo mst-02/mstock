@@ -8,6 +8,8 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -22,8 +24,10 @@ jobs:
       - name: Convert PNG to ICO
         run: node scripts/convert-icon.js
 
-      - name: Build Windows installer
-        run: npm run build
+      - name: Build and Publish Windows installer
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --win nsis --x64 --publish always
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v4
