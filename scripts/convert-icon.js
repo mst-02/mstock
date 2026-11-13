@@ -20,9 +20,11 @@ const sharp = require('sharp');
       .png()
       .toBuffer();
 
+    fs.writeFileSync(path.join(outDir, 'icon.png'), pngBuffer);
+
     const icoBuf = await pngToIco(pngBuffer);
     fs.writeFileSync(path.join(outDir, 'icon.ico'), icoBuf);
-    console.log('Conversion finished: build/icon.ico');
+    console.log('Conversion finished: build/icon.ico and build/icon.png');
     process.exit(0);
   } catch (err) {
     console.error('Conversion failed', err);
